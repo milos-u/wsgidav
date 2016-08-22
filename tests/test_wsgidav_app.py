@@ -138,11 +138,11 @@ class ServerTest(unittest.TestCase):
         assert res.body == data3, "GET file content different from PUT"
 
         # Request must not contain a body (expect '415 Media Type Not Supported')
-        # TODO: Py3: webtest.TestApp fails here
-        app.get("/file1.txt",
-                headers={"Content-Length": compat.to_native(len(data1))},
-                params=data1,
-                status=415)
+        app.request("/file1.txt",
+                    method="GET",
+                    headers={"Content-Length": compat.to_native(len(data1))},
+                    body=data1,
+                    status=415)
 
         # Delete existing resource (expect '204 No Content')
         app.delete("/file1.txt", status=204)
@@ -163,27 +163,41 @@ class ServerTest(unittest.TestCase):
 
         data = uniData.encode("utf8")
 
-        def __testrw(filename):
-            # Write/read UTF-8 encoded file name
-            # filename = compat.to_bytes(filename)
-            # filename = compat.to_unicode(filename)
-            print(util.stringRepr(filename))
+        # From PEP 3333:
+        # enc, esc = sys.getfilesystemencoding(), 'surrogateescape'
+        # def unicode_to_wsgi(u):
+        #     # Convert an environment variable to a WSGI "bytes-as-unicode" string
+        #     return u.encode(enc, esc).decode('iso-8859-1')
+        # def wsgi_to_bytes(s):
+        #     return s.encode('iso-8859-1')
 
+        def __testrw(filename):
+            # print(util.stringRepr(filename))
             app.delete(filename, expect_errors=True)
             app.put(filename, params=data, status=201)
             res = app.get(filename, status=200)
             assert res.body == data, "GET file content different from PUT"
 
         # filenames with umlauts äöüß
+        #
+        # See https://www.python.org/dev/peps/pep-3333/#unicode-issues
+        # NOTE:
+        #   Only latin-1 encoded bytestrings are allowed in filenames
+        #        
         # TODO: Py3: seems that webtest.TestApp
         #   - Py2: only supports latin-1 bytestrings?
         #   - Py3: only supports ascii
-        # __testrw(b"/file uml(\xE4\xF6\xFC\xDF).txt".decode("latin1"))
-        __testrw(b"/file uml(\xE4\xF6\xFC\xDF).txt")
-        __testrw(u"/file uml(\u00E4\u00F6\u00FC\u00DF).txt".encode("latin1"))
-        # UTF-8 encoded filenames
-        __testrw(b"/file euro(\xE2\x82\xAC).txt")
-        __testrw(b"/file male(\xE2\x99\x82).txt")
+
+        def unicode_to_url(s):
+            # TODO: Py3: Is this the correct way?
+            return compat.quote(s.encode("utf8"))
+
+        # äöüß: (part of latin1)
+        __testrw(unicode_to_url(u"/file uml(\u00E4\u00F6\u00FC\u00DF).txt"))
+        # Euro sign (not latin1, but Cp1252)
+        __testrw(unicode_to_url(u"/file euro(\u20AC).txt"))
+        # Male sign (only utf8)
+        __testrw(unicode_to_url(u"/file male(\u2642).txt"))
 
 
     def testAuthentication(self):

@@ -106,9 +106,6 @@ class WsgiDAVLitmusTest(unittest.TestCase):
             time.sleep(1)
 
             try:
-                print("* "*20, file=sys.stderr)
-                print("ENVIRON", os.environ, file=sys.stderr)
-                print("TRAVIS", os.environ.get("TRAVIS"), file=sys.stderr)
                 res = subprocess.call(["litmus", "http://127.0.0.1:8080/", "tester", "secret"],
                                       # stdout=sys.stdout, stderr=sys.stderr
                                       )
