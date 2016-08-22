@@ -168,7 +168,7 @@ class DAVClient(object):
         body = BytesIO()
         tree.write(body)
         body = body.getvalue()  # bytestring
-        body = b'<?xml version="1.0" encoding="utf-8" ?>\n%s' % body
+        body = b'<?xml version="1.0" encoding="utf-8" ?>\n' + body
         assert is_bytes(body)
         return body
         
