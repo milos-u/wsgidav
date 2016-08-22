@@ -305,7 +305,7 @@ class ServerTest(unittest.TestCase):
                 y
         """
         client = self.client
-        data = "this is a file\nwith two lines"
+        data = b"this is a file\nwith two lines"
 
         client.delete("/test/")
         client.mkcol("/test/")
@@ -350,7 +350,7 @@ class ServerTest(unittest.TestCase):
         client2.copy("/test/x/y", "/test/a/y")
         client2.checkResponse(423)
         # PUT or MKCOL request that would create a new internal member
-        client2.put("/test/a/x", "data")
+        client2.put("/test/a/x", b"data")
         client2.checkResponse(423)
         client2.mkcol("/test/a/e")
         client2.checkResponse(423)
@@ -460,10 +460,10 @@ class ServerTest(unittest.TestCase):
                           set_props=[("{testns:}testname", "testval")])
         client2.checkMultiStatusResponse(200)
         # Modifying a member without creating a new resource is allowed
-        client2.put("/test/a/c", "data")
+        client2.put("/test/a/c", b"data")
         client2.checkResponse(204)
         # Modifying non-internal member resources is allowed
-        client2.put("/test/a/b/f", "data")
+        client2.put("/test/a/b/f", b"data")
         client2.checkResponse(201)
         client2.mkcol("/test/a/b/g")
         client2.checkResponse(201)
