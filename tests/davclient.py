@@ -140,7 +140,7 @@ class DAVClient(object):
         
         self._connection.close()  # prevent ResourceWarning: unclosed <socket.socket on Py3
         self._connection = None
-
+        assert is_bytes(self.response.body)
         # Try to parse and get an etree
         try:
             self._get_response_tree()
@@ -153,13 +153,23 @@ class DAVClient(object):
         self.response.tree = ElementTree.fromstring(self.response.body)
         return self.response.tree
         
-    def _tree_to_body_str(self, tree):
-        """Return tree content as body compatible native xml string."""
+    # def _tree_to_body_str(self, tree):
+    #     """Return tree content as body compatible native xml string."""
+    #     # Etree won't just return a normal string, so we have to do this
+    #     body = BytesIO()
+    #     tree.write(body)
+    #     body = body.getvalue()  # bytestring
+    #     body = '<?xml version="1.0" encoding="utf-8" ?>\n%s' % to_native(body)
+    #     return body
+
+    def _tree_to_binary_body(self, tree):
+        """Return tree content as xml bytestring."""
         # Etree won't just return a normal string, so we have to do this
         body = BytesIO()
         tree.write(body)
         body = body.getvalue()  # bytestring
-        body = '<?xml version="1.0" encoding="utf-8" ?>\n%s' % to_native(body)
+        body = b'<?xml version="1.0" encoding="utf-8" ?>\n%s' % body
+        assert is_bytes(body)
         return body
         
     def set_basic_auth(self, username, password):
@@ -187,6 +197,7 @@ class DAVClient(object):
         
     def put(self, path, body=None, f=None, headers=None):
         """Put resource with body"""
+        assert body is None or is_bytes(body)
         if f is not None:
             body = f.read()
             
@@ -194,7 +205,7 @@ class DAVClient(object):
         
     def post(self, path, body=None, headers=None):
         """POST resource with body"""
-
+        assert body is None or is_bytes(body)
         self._request('POST', path, body=body, headers=headers)
         
     def mkcol(self, path, headers=None):
@@ -210,6 +221,7 @@ class DAVClient(object):
     def copy(self, source, destination, body=None, depth='infinity', overwrite=True, headers=None):
         """Copy DAV resource"""
         # Set all proper headers
+        assert body is None or is_bytes(body)
         if headers is None:
             headers = {'Destination':destination}
         else:
@@ -226,7 +238,7 @@ class DAVClient(object):
         Note: support for the 'propertybehavior' request body for COPY and MOVE 
               has been removed with RFC4918
         """
-        body = '<?xml version="1.0" encoding="utf-8" ?><d:propertybehavior xmlns:d="DAV:"><d:keepalive>*</d:keepalive></d:propertybehavior>'
+        body = b'<?xml version="1.0" encoding="utf-8" ?><d:propertybehavior xmlns:d="DAV:"><d:keepalive>*</d:keepalive></d:propertybehavior>'
         
         # Add proper headers
         if headers is None:
@@ -238,6 +250,7 @@ class DAVClient(object):
         
     def move(self, source, destination, body=None, depth='infinity', overwrite=True, headers=None):
         """Move DAV resource"""
+        assert body is None or is_bytes(body)
         # Set all proper headers
         if headers is None:
             headers = {'Destination':destination}
@@ -256,7 +269,7 @@ class DAVClient(object):
         Note: support for the 'propertybehavior' request body for COPY and MOVE 
               has been removed with RFC4918
         """
-        body = '<?xml version="1.0" encoding="utf-8" ?><d:propertybehavior xmlns:d="DAV:"><d:keepalive>*</d:keepalive></d:propertybehavior>'
+        body = b'<?xml version="1.0" encoding="utf-8" ?><d:propertybehavior xmlns:d="DAV:"><d:keepalive>*</d:keepalive></d:propertybehavior>'
         
         # Add proper headers
         if headers is None:
@@ -277,7 +290,7 @@ class DAVClient(object):
             object_to_etree(props, properties, namespace=namespace)
         tree = ElementTree.ElementTree(root)
         
-        body = self._tree_to_body_str(tree)
+        body = self._tree_to_binary_body(tree)
                 
         # Add proper headers
         if headers is None:
@@ -330,7 +343,7 @@ class DAVClient(object):
         
         tree = ElementTree.ElementTree(root)
 
-        body = self._tree_to_body_str(tree)
+        body = self._tree_to_binary_body(tree)
 
         # Add proper headers
         if headers is None:
@@ -354,7 +367,7 @@ class DAVClient(object):
         headers['Content-Type'] = 'text/xml; charset="utf-8"'
         headers['Timeout'] = 'Infinite, Second-4100000000'
         
-        body = self._tree_to_body_str(tree)
+        body = self._tree_to_binary_body(tree)
 
         self._request('LOCK', path, body=body, headers=headers)
         
