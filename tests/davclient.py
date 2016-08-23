@@ -153,15 +153,6 @@ class DAVClient(object):
         self.response.tree = ElementTree.fromstring(self.response.body)
         return self.response.tree
         
-    # def _tree_to_body_str(self, tree):
-    #     """Return tree content as body compatible native xml string."""
-    #     # Etree won't just return a normal string, so we have to do this
-    #     body = BytesIO()
-    #     tree.write(body)
-    #     body = body.getvalue()  # bytestring
-    #     body = '<?xml version="1.0" encoding="utf-8" ?>\n%s' % to_native(body)
-    #     return body
-
     def _tree_to_binary_body(self, tree):
         """Return tree content as xml bytestring."""
         # Etree won't just return a normal string, so we have to do this

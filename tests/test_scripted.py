@@ -495,19 +495,6 @@ class ServerTest(unittest.TestCase):
 #===============================================================================
 # suite
 #===============================================================================
-# def suite():
-#     """Return suites of all test cases."""
-#     return unittest.TestSuite([ServerTest.suite(),
-#                                ])
-
-# def main():
-#     _suite = suite()
-#     unittest.TextTestRunner(descriptions=1, verbosity=2).run(_suite)
 
 if __name__ == "__main__":
     unittest.main()
-# #    global EXTERNAL_SERVER_ADDRESS
-# #    EXTERNAL_SERVER_ADDRESS = "http://127.0.0.1:8080"
-# #    print "Using external server to enable debugging: ", EXTERNAL_SERVER_ADDRESS
-#
-#     main()

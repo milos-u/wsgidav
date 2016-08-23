@@ -24,7 +24,7 @@ from wsgidav.fs_dav_provider import FilesystemProvider
 from wsgidav.wsgidav_app import DEFAULT_CONFIG, WsgiDAVApp
 
 try:
-    from webtest import TestApp
+    import webtest
 except ImportError:
     print("*" * 70, file=sys.stderr)
     print("Could not import webtest.TestApp: some tests will fail.", file=sys.stderr)
@@ -71,7 +71,7 @@ class ServerTest(unittest.TestCase):
 
     def setUp(self):
         wsgi_app = self._makeWsgiDAVApp(False)
-        self.app = TestApp(wsgi_app)
+        self.app = webtest.TestApp(wsgi_app)
 
 
     def tearDown(self):
@@ -211,7 +211,7 @@ class ServerTest(unittest.TestCase):
 
         # Re-create test app with authentication
         wsgi_app = self._makeWsgiDAVApp(True)
-        app = self.app = TestApp(wsgi_app)
+        app = self.app = webtest.TestApp(wsgi_app)
 
         # Anonymous access must fail (expect 401 Not Authorized)
         # Existing resource
