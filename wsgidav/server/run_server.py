@@ -335,7 +335,7 @@ def _runPaste(app, config, mode):
     return True
 
 def _runCherryPy(app, config, mode):
-    """Run WsgiDAV using cherrypy.wsgiserver, if CherryPy is installed."""
+    """Run WsgiDAV using cherrypy.wsgiserver if CherryPy is installed."""
     assert mode in ("cherrypy", "cherrypy-bundled")
 
     try:

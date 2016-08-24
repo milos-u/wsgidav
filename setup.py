@@ -129,7 +129,9 @@ setup(name="WsgiDAV",
                      "License :: OSI Approved :: MIT License",
                      "Operating System :: OS Independent",
                      "Programming Language :: Python :: 2.7",
-                     "Programming Language :: Python :: 3",
+                     "Programming Language :: Python :: 3.3",
+                     "Programming Language :: Python :: 3.4",
+                     "Programming Language :: Python :: 3.5",
                      "Topic :: Internet :: WWW/HTTP",
                      "Topic :: Internet :: WWW/HTTP :: HTTP Servers",
                      "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
@@ -161,11 +163,6 @@ setup(name="WsgiDAV",
       entry_points = {
           "console_scripts" : ["wsgidav = wsgidav.server.run_server:run"],
           },
-      # TODO: PP:
-#      entry_points = """
-#      [paste.app_factory]
-#      main = wsgidav.wsgiapp:make_app
-#      """,
       executables = executables,
       options = {"build_exe": build_exe_options,
                  "bdist_msi": bdist_msi_options,
