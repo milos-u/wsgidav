@@ -1,4 +1,4 @@
-# (c) 2009-2015 Martin Wendt and contributors; see WsgiDAV https://github.com/mar10/wsgidav
+# (c) 2009-2016 Martin Wendt and contributors; see WsgiDAV https://github.com/mar10/wsgidav
 # Original PyFileServer (c) 2005 Ho Chun Wei.
 # Licensed under the MIT license: http://www.opensource.org/licenses/mit-license.php
 """
@@ -91,6 +91,7 @@ DEFAULT_CONFIG = {
     "acceptbasic": True,      # Allow basic authentication, True or False
     "acceptdigest": True,     # Allow digest authentication, True or False
     "defaultdigest": True,    # True (default digest) or False (default basic)
+    "trusted_auth_header": None,  # Name of a header field that will be accepted as authorized user
 
     # Error printer options
     "catchall": False,

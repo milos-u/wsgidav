@@ -1,4 +1,4 @@
-# (c) 2009-2015 Martin Wendt and contributors; see WsgiDAV https://github.com/mar10/wsgidav
+# (c) 2009-2016 Martin Wendt and contributors; see WsgiDAV https://github.com/mar10/wsgidav
 # Original PyFileServer (c) 2005 Ho Chun Wei.
 # Licensed under the MIT license: http://www.opensource.org/licenses/mit-license.php
 """
@@ -148,9 +148,13 @@ class HTTPAuthenticator(BaseMiddleware):
         self._acceptbasic = config.get("acceptbasic", True)
         self._acceptdigest = config.get("acceptdigest", True)
         self._defaultdigest = config.get("defaultdigest", True)
+        self._trusted_auth_header = config.get("trusted_auth_header", None)
         self._noncedict = dict([])
 
         self._headerparser = re.compile(r"([\w]+)=([^,]*),")
+        # Note: extra parser to handle digest auth requests from certain
+        # clients, that leave commas un-encoded to interfere with the above.
+        self._headerfixparser = re.compile(r'([\w]+)=("[^"]*,[^"]*"),')
         self._headermethod = re.compile(r"^([\w]+)")
         
         wdcName = "NTDomainController"
@@ -182,6 +186,14 @@ class HTTPAuthenticator(BaseMiddleware):
             environ["http_authenticator.username"] = ""
             return self._application(environ, start_response)
         
+        if self._trusted_auth_header and environ.get(self._trusted_auth_header):
+            # accept a username that was injected by a trusted upstream server
+            _logger.debug("Accept trusted username %s='%s'for realm '%s'"
+                % (self._trusted_auth_header, environ.get(self._trusted_auth_header), realmname))
+            environ["http_authenticator.realm"] = realmname
+            environ["http_authenticator.username"] = environ.get(self._trusted_auth_header)
+            return self._application(environ, start_response)
+
         if "HTTP_AUTHORIZATION" in environ:
             authheader = environ["HTTP_AUTHORIZATION"] 
             authmatch = self._headermethod.search(authheader)          
@@ -252,7 +264,7 @@ class HTTPAuthenticator(BaseMiddleware):
         nonce_source = timekey + calc_hexdigest(timekey + ":" + etagkey + ":" + serverkey)
         # nonce = to_native(base64.b64encode(compat.to_bytes(nonce_source)))
         nonce = calc_base64(nonce_source)
-        wwwauthheaders = ('Digest realm="%s", nonce="%s", algorithm="MD5", qop="auth"'
+        wwwauthheaders = ('Digest realm="%s", nonce="%s", algorithm=MD5, qop="auth"'
             % (realmname, nonce))
 
         _logger.debug("401 Not Authorized for realm '%s' (digest): %s" % (realmname, wwwauthheaders))
@@ -277,7 +289,18 @@ class HTTPAuthenticator(BaseMiddleware):
         authheaders = environ["HTTP_AUTHORIZATION"] + ","
         if not authheaders.lower().strip().startswith("digest"):
             isinvalidreq = True
+        # Hotfix for Windows file manager and OSX Finder:
+        # Some clients don't urlencode paths in auth header, so uri value may
+        # contain commas, which break the usual regex headerparser. Example:
+        # Digest username="user",realm="/",uri="a,b.txt",nc=00000001, ...
+        # -> [..., ('uri', '"a'), ('nc', '00000001'), ...]
+        # Override any such values with carefully extracted ones.
         authheaderlist = self._headerparser.findall(authheaders)
+        authheaderfixlist = self._headerfixparser.findall(authheaders)
+        if authheaderfixlist:
+            _logger.info("Fixing authheader comma-parsing: extend %s with %s" \
+                         % (authheaderlist, authheaderfixlist))
+            authheaderlist += authheaderfixlist
         for authheader in authheaderlist:
             authheaderkey = authheader[0]
             authheadervalue = authheader[1].strip().strip("\"")
