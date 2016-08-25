@@ -28,18 +28,6 @@ class Tox(TestCommand):
         sys.exit(errcode)
 
 
-# Override 'setup.py test' command
-# class PyTest(TestCommand):
-#      def finalize_options(self):
-#          TestCommand.finalize_options(self)
-#          self.test_args = []
-#          self.test_suite = True
-#      def run_tests(self):
-#          import pytest
-#          errcode = pytest.main(self.test_args)
-#          sys.exit(errcode)
-
-
 # TODO: Add support for 'setup.py sphinx'
 #       see http://stackoverflow.com/a/22273180/19166
 
@@ -55,11 +43,6 @@ except ImportError:
     print("See https://pypi.python.org/pypi/cx_Freeze")
     executables = []
 
-# TODO: 2016-08-21: remove this comments if setup release run successfully
-# g_dict = {}
-# exec(open("wsgidav/_version.py").read(), g_dict)
-# version = g_dict["__version__"]
-
 try:
   readme = open("readme_pypi.rst", "rt").read()
 except IOError:
@@ -72,16 +55,13 @@ if not "HOME" in os.environ and  "HOMEPATH" in os.environ:
 
 install_requires = [#"colorama",
                     #"keyring",
+                    #"lxml",
                     ]
 tests_require = ["pytest",
                  "pytest-cov",
                  "tox",
                  "webtest",
                  ]
-
-if sys.version_info < (2, 7):
-    install_requires += ["argparse"]
-    tests_require += ["unittest2"]
 
 setup_requires = install_requires
 
@@ -109,26 +89,21 @@ setup(name="WsgiDAV",
       url = "https://github.com/mar10/wsgidav/",
       description = "Generic WebDAV server based on WSGI",
       long_description = readme,
-#       long_description = """\
-# WsgiDAV is a WebDAV server for sharing files and other resources over the web.
-# It is based on the WSGI interface <http://www.python.org/peps/pep-0333.html>.
-# It comes bundled with a simple WSGI web server.
-# *This package is based on PyFileServer by Ho Chun Wei.*
-# Project home: https://github.com/mar10/wsgidav/
-# """,
 
-        #Development Status :: 2 - Pre-Alpha
-        #Development Status :: 3 - Alpha
-        #Development Status :: 4 - Beta
-        #Development Status :: 5 - Production/Stable
-
-      classifiers = ["Development Status :: 3 - Alpha",
+      #Development Status :: 2 - Pre-Alpha
+      #Development Status :: 3 - Alpha
+      #Development Status :: 4 - Beta
+      #Development Status :: 5 - Production/Stable
+      
+      classifiers = ["Development Status :: 4 - Beta",
                      "Intended Audience :: Information Technology",
                      "Intended Audience :: Developers",
                      "Intended Audience :: System Administrators",
                      "License :: OSI Approved :: MIT License",
                      "Operating System :: OS Independent",
+                     "Programming Language :: Python :: 2",
                      "Programming Language :: Python :: 2.7",
+                     "Programming Language :: Python :: 3",
                      "Programming Language :: Python :: 3.3",
                      "Programming Language :: Python :: 3.4",
                      "Programming Language :: Python :: 3.5",
@@ -143,7 +118,6 @@ setup(name="WsgiDAV",
       keywords = "web wsgi webdav application server",
 #      platforms=["Unix", "Windows"],
       license = "The MIT License",
-#      install_requires = ["lxml"],
       packages = find_packages(exclude=['tests']),
       install_requires = install_requires,
       setup_requires = setup_requires,
@@ -155,10 +129,6 @@ setup(name="WsgiDAV",
 #      include_package_data = True, # TODO: PP
       zip_safe = False,
       extras_require = {},
-      # tests_require = ["nose",   # run nosetests
-      #                  "Paste",  # paste.fixture.TestApp
-      #                  ],
-      # test_suite = "nose.collector",
       cmdclass = {"test": Tox},
       entry_points = {
           "console_scripts" : ["wsgidav = wsgidav.server.run_server:run"],
