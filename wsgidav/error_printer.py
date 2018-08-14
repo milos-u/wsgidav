@@ -112,13 +112,18 @@ class ErrorPrinter(BaseMiddleware):
             content_type, body = e.get_response_page()
 
             # TODO: provide exc_info=sys.exc_info()?
+            if e.value == 403:
+                headers = [("X-MSDAVEXT_Error", "131135; Insufficient permissions.")]
+            else:
+                headers = []
+
             start_response(
                 status,
                 [
                     ("Content-Type", content_type),
                     ("Content-Length", str(len(body))),
                     ("Date", util.get_rfc1123_time()),
-                ],
+                ] + headers,
             )
             yield body
             return
