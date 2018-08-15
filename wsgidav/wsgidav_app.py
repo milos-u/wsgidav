@@ -65,7 +65,7 @@ from wsgidav.property_manager import PropertyManager
 from wsgidav.util import (
     dynamic_import_class,
     dynamic_instantiate_middleware,
-    safe_re_encode,
+    safe_re_encode, get_stdout_encoding
 )
 
 __docformat__ = "reStructuredText"
@@ -463,7 +463,7 @@ class WsgiDAVApp(object):
                         time=util.get_log_time(),
                         method=environ.get("REQUEST_METHOD"),
                         path=safe_re_encode(
-                            environ.get("PATH_INFO", ""), sys.stdout.encoding
+                            environ.get("PATH_INFO", ""), get_stdout_encoding()
                         ),
                         extra=extra,
                         status=status,

@@ -58,7 +58,7 @@ class WsgiDAVDomainController(object):
             if environ["wsgidav.verbose"] >= 2:
                 _logger.debug(
                     "get_domain_realm({}): '{}'".format(
-                        util.safe_re_encode(inputURL, sys.stdout.encoding), None
+                        util.safe_re_encode(inputURL, util.get_stdout_encoding()), None
                     )
                 )
             return None

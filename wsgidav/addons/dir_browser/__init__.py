@@ -13,7 +13,7 @@ from jinja2 import Environment, FileSystemLoader
 from wsgidav import __version__, compat, util
 from wsgidav.dav_error import HTTP_MEDIATYPE_NOT_SUPPORTED, HTTP_OK, DAVError
 from wsgidav.middleware import BaseMiddleware
-from wsgidav.util import safe_re_encode
+from wsgidav.util import safe_re_encode, get_stdout_encoding
 
 __docformat__ = "reStructuredText"
 
@@ -120,7 +120,7 @@ class WsgiDavDirBrowser(BaseMiddleware):
         if self.verbose >= 4:
             _logger.warn(
                 "Raising DAVError {}".format(
-                    safe_re_encode(e.get_user_info(), sys.stdout.encoding)
+                    safe_re_encode(e.get_user_info(), get_stdout_encoding())
                 )
             )
         raise e

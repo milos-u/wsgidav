@@ -1297,3 +1297,10 @@ def guess_mime_type(url):
     if not mimetype:
         mimetype = "application/octet-stream"
     return mimetype
+
+
+def get_stdout_encoding():
+    try:
+        return sys.stdout.encoding
+    except AttributeError:
+        return "UTF-8"
