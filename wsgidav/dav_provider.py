@@ -1533,3 +1533,6 @@ class DAVProvider(object):
         - do additional processing and call default_handler(environ, start_response)
         """
         return default_handler(environ, start_response)
+
+    def enable_propfind_infinite(self):
+        return True

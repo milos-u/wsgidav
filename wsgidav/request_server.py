@@ -44,7 +44,7 @@ DEFAULT_BLOCK_SIZE = 8192
 class RequestServer(object):
     def __init__(self, davProvider):
         self._davProvider = davProvider
-        self.allowPropfindInfinite = True
+        self.allowPropfindInfinite = davProvider.enable_propfind_infinite()
         self._verbose = 3
         self.block_size = DEFAULT_BLOCK_SIZE
         _logger.debug("RequestServer: __init__")
@@ -183,6 +183,10 @@ class RequestServer(object):
 
         If depth=='infinity', we also raise when child resources are locked.
         """
+
+        if res.is_readonly():
+            raise DAVError(HTTP_FORBIDDEN)
+
         lockMan = self._davProvider.lockManager
         if lockMan is None or res is None:
             return True
