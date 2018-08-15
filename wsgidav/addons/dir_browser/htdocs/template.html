@@ -33,7 +33,7 @@
   {% endif %}
 
   {%- if username and config.show_user %}
-  <p class="auth-user">Authenticated user: "{{username}}", realm: "{{realm}}".</p>
+  <p class="auth-user">Authenticated user: "{{username}}", realm: "{{realm}}". <a class="logout" href="/" onclick="return doLogout(event)">[Logout]</a></p>
   {% endif -%}
 
   <hr>

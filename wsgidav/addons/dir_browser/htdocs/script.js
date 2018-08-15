@@ -57,3 +57,16 @@ function openWithSharePointPlugin(url) {
     }
     return res;
 }
+
+function doLogout(event) {
+    if (window.ActiveXObject) {
+        document.execCommand("ClearAuthenticationCache");
+        window.location.reload();
+    } else {
+        event.preventDefault();
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("GET", "_always_401/", true);
+        xhttp.send();
+        return false;
+    }
+}
