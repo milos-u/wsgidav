@@ -1535,4 +1535,9 @@ class DAVProvider(object):
         return default_handler(environ, start_response)
 
     def enable_propfind_infinite(self):
+        """ enable / disable PROPFIND with 'infinite' depth """
         return True
+
+    def handle_error_500(self, environ):
+        """ custom handler for error 500 """
+        pass

@@ -75,6 +75,11 @@ class ErrorPrinter(BaseMiddleware):
                 raise
             except Exception as e:
                 # Caught a non-DAVError
+
+                provider = environ.get("wsgidav.provider", None)
+                if provider:
+                    provider.handle_error_500(environ)
+
                 if self._catch_all_exceptions:
                     # Catch all exceptions to return as 500 Internal Error
                     # traceback.print_exc(10, environ.get("wsgi.errors") or sys.stderr)
