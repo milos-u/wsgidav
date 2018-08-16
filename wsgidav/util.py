@@ -224,13 +224,13 @@ def init_logging(config):
     logger.propagate = False
 
     # Remove previous handlers
-    for hdlr in logger.handlers[:]:  # Must iterate an array copy
-        try:
-            hdlr.flush()
-            hdlr.close()
-        except Exception:
-            pass
-        logger.removeHandler(hdlr)
+    #for hdlr in logger.handlers[:]:  # Must iterate an array copy
+    #    try:
+    #        hdlr.flush()
+    #        hdlr.close()
+    #    except Exception:
+    #        pass
+    #    logger.removeHandler(hdlr)
 
     logger.addHandler(consoleHandler)
 
