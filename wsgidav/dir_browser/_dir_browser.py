@@ -242,13 +242,8 @@ class WsgiDavDirBrowser(BaseMiddleware):
         sort = "name"
         if sort == "name":
             rows.sort(
-<<<<<<< HEAD:wsgidav/addons/dir_browser/__init__.py
                 key=lambda v: u"{}{}".format(
                     not v["is_collection"], v["displayName"].lower()
-=======
-                key=lambda v: "{}{}".format(
-                    not v["is_collection"], v["display_name"].lower()
->>>>>>> upstream/master:wsgidav/dir_browser/_dir_browser.py
                 )
             )
 
