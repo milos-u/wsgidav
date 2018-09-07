@@ -1,4 +1,4 @@
-# -*- coding: iso-8859-1 -*-
+# -*- coding: utf-8 -*-
 # (c) 2009-2018 Martin Wendt and contributors; see WsgiDAV https://github.com/mar10/wsgidav
 # Licensed under the MIT license:
 # http://www.opensource.org/licenses/mit-license.php
@@ -192,8 +192,8 @@ def _bench_script(opts):
             locks = client.set_lock(
                 "/test/lock-0",
                 owner="test-bench",
-                locktype="write",
-                lockscope="exclusive",
+                lock_type="write",
+                lock_scope="exclusive",
                 depth="infinity",
             )
             token = locks[0]

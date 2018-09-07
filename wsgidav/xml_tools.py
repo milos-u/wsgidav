@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # (c) 2009-2018 Martin Wendt and contributors; see WsgiDAV https://github.com/mar10/wsgidav
 # Original PyFileServer (c) 2005 Ho Chun Wei.
 # Licensed under the MIT license:
@@ -28,6 +29,7 @@ try:
     use_lxml = True
     _ElementType = etree._Element
 except ImportError:
+    # warnings.warn("Could not import lxml")  # , ImportWarning)
     # Try xml module (Python 2.5 or later) with safe defaults
     from defusedxml import ElementTree as etree
 
@@ -88,23 +90,23 @@ def xml_to_bytes(element, pretty_print=False):
 
 
 def make_multistatus_el():
-    """Wrapper for etree.Element, that takes care of unsupported nsmap option."""
+    """Wrapper for etree.Element, that takes care of unsupported ns_map option."""
     if use_lxml:
-        return etree.Element("{DAV:}multistatus", nsmap={"D": "DAV:"})
+        return etree.Element("{DAV:}multistatus", ns_map={"D": "DAV:"})
     return etree.Element("{DAV:}multistatus")
 
 
 def make_prop_el():
-    """Wrapper for etree.Element, that takes care of unsupported nsmap option."""
+    """Wrapper for etree.Element, that takes care of unsupported ns_map option."""
     if use_lxml:
-        return etree.Element("{DAV:}prop", nsmap={"D": "DAV:"})
+        return etree.Element("{DAV:}prop", ns_map={"D": "DAV:"})
     return etree.Element("{DAV:}prop")
 
 
-def make_sub_element(parent, tag, nsmap=None):
-    """Wrapper for etree.SubElement, that takes care of unsupported nsmap option."""
+def make_sub_element(parent, tag, ns_map=None):
+    """Wrapper for etree.SubElement, that takes care of unsupported ns_map option."""
     if use_lxml:
-        return etree.SubElement(parent, tag, nsmap=nsmap)
+        return etree.SubElement(parent, tag, ns_map=ns_map)
     return etree.SubElement(parent, tag)
 
 

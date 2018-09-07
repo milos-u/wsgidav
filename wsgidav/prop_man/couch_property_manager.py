@@ -10,7 +10,7 @@ http://packages.python.org/CouchDB/views.html
 
 Usage: add this lines to wsgidav.conf::
 
-    from wsgidav.addons.couch_property_manager import CouchPropertyManager
+    from wsgidav.prop_man.couch_property_manager import CouchPropertyManager
     prop_man_opts = {}
     property_manager = CouchPropertyManager(prop_man_opts)
 
@@ -138,67 +138,65 @@ class CouchPropertyManager(object):
             yield row.doc
         return
 
-    def get_properties(self, normurl, environ=None):
-        _logger.debug("get_properties(%s)" % normurl)
-        doc = self._find(normurl)
+    def get_properties(self, norm_url, environ=None):
+        _logger.debug("get_properties(%s)" % norm_url)
+        doc = self._find(norm_url)
         propNames = []
         if doc:
             for name in doc["properties"].keys():
                 propNames.append(name)
         return propNames
 
-    def get_property(self, normurl, propname, environ=None):
-        _logger.debug("get_property(%s, %s)" % (normurl, propname))
-        doc = self._find(normurl)
+    def get_property(self, norm_url, name, environ=None):
+        _logger.debug("get_property(%s, %s)" % (norm_url, name))
+        doc = self._find(norm_url)
         if not doc:
             return None
-        prop = doc["properties"].get(propname)
+        prop = doc["properties"].get(name)
         return prop
 
     def write_property(
-        self, normurl, propname, propertyvalue, dryRun=False, environ=None
+        self, norm_url, name, property_value, dry_run=False, environ=None
     ):
-        assert normurl and normurl.startswith("/")
-        assert propname
-        assert propertyvalue is not None
+        assert norm_url and norm_url.startswith("/")
+        assert name
+        assert property_value is not None
 
         _logger.debug(
-            "write_property(%s, %s, dryRun=%s):\n\t%s"
-            % (normurl, propname, dryRun, propertyvalue)
+            "write_property(%s, %s, dry_run=%s):\n\t%s"
+            % (norm_url, name, dry_run, property_value)
         )
-        if dryRun:
+        if dry_run:
             return  # TODO: can we check anything here?
 
-        doc = self._find(normurl)
+        doc = self._find(norm_url)
         if doc:
-            doc["properties"][propname] = propertyvalue
+            doc["properties"][name] = property_value
         else:
             doc = {
                 "_id": uuid4().hex,  # Documentation suggests to set the id
-                "url": normurl,
-                "title": compat.quote(normurl),
+                "url": norm_url,
+                "title": compat.quote(norm_url),
                 "type": "properties",
-                "properties": {propname: propertyvalue},
+                "properties": {name: property_value},
             }
         self.db.save(doc)
 
-    def remove_property(self, normurl, propname, dryRun=False, environ=None):
-        _logger.debug(
-            "remove_property(%s, %s, dryRun=%s)" % (normurl, propname, dryRun)
-        )
-        if dryRun:
+    def remove_property(self, norm_url, name, dry_run=False, environ=None):
+        _logger.debug("remove_property(%s, %s, dry_run=%s)" % (norm_url, name, dry_run))
+        if dry_run:
             # TODO: can we check anything here?
             return
-        doc = self._find(normurl)
+        doc = self._find(norm_url)
         # Specifying the removal of a property that does not exist is NOT an error.
-        if not doc or doc["properties"].get(propname) is None:
+        if not doc or doc["properties"].get(name) is None:
             return
-        del doc["properties"][propname]
+        del doc["properties"][name]
         self.db.save(doc)
 
-    def remove_properties(self, normurl, environ=None):
-        _logger.debug("remove_properties(%s)" % normurl)
-        doc = self._find(normurl)
+    def remove_properties(self, norm_url, environ=None):
+        _logger.debug("remove_properties(%s)" % norm_url)
+        doc = self._find(norm_url)
         if doc:
             self.db.delete(doc)
         return
@@ -221,9 +219,9 @@ class CouchPropertyManager(object):
         }
         self.db.save(doc2)
 
-    def move_properties(self, srcUrl, destUrl, withChildren, environ=None):
-        _logger.debug("move_properties(%s, %s, %s)" % (srcUrl, destUrl, withChildren))
-        if withChildren:
+    def move_properties(self, srcUrl, destUrl, with_children, environ=None):
+        _logger.debug("move_properties(%s, %s, %s)" % (srcUrl, destUrl, with_children))
+        if with_children:
             # Match URLs that are equal to <srcUrl> or begin with '<srcUrl>/'
             docList = self._find_descendents(srcUrl)
             for doc in docList:

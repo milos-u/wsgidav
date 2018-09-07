@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Abstract base middleware class (optional use).
 """
@@ -14,7 +15,7 @@ class BaseMiddleware(object):
 
     Derived classes in WsgiDAV include::
 
-        wsgidav.addons.dir_browser.WsgiDavDirBrowser
+        wsgidav.dir_browser.WsgiDavDirBrowser
         wsgidav.debug_filter.WsgiDavDebugFilter
         wsgidav.error_printer.ErrorPrinter
         wsgidav.http_authenticator.HTTPAuthenticator

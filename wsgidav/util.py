@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # (c) 2009-2018 Martin Wendt and contributors; see WsgiDAV https://github.com/m ar10/wsgidav
 # Original PyFileServer (c) 2005 Ho Chun Wei.
 # Licensed under the MIT license:
@@ -247,6 +248,7 @@ def get_module_logger(moduleName, defaultToVerbose=False):
 
     @see: unit.init_logging
     """
+    # moduleName = moduleName.split(".")[-1]
     if not moduleName.startswith(BASE_LOGGER_NAME + "."):
         moduleName = BASE_LOGGER_NAME + "." + moduleName
     logger = logging.getLogger(moduleName)
@@ -358,10 +360,10 @@ def pop_path2(path):
     return (first, second, "/" + rest)
 
 
-def shift_path(scriptName, pathInfo):
+def shift_path(script_name, path_info):
     """Return ('/a', '/b/c') -> ('b', '/a/b', 'c')."""
-    segment, rest = pop_path(pathInfo)
-    return (segment, join_uri(scriptName.rstrip("/"), segment), rest.rstrip("/"))
+    segment, rest = pop_path(path_info)
+    return (segment, join_uri(script_name.rstrip("/"), segment), rest.rstrip("/"))
 
 
 def split_namespace(clarkName):
@@ -378,12 +380,14 @@ def split_namespace(clarkName):
     return ("", clarkName)
 
 
-def toUnicode(s):
+def to_unicode_safe(s):
     """Convert a binary string to Unicode using UTF-8 (fallback to ISO-8859-1)."""
     try:
         u = compat.to_unicode(s, "utf8")
     except ValueError:
-        _logger.error("toUnicode({!r}) *** UTF-8 failed. Trying ISO-8859-1".format(s))
+        _logger.error(
+            "to_unicode_safe({!r}) *** UTF-8 failed. Trying ISO-8859-1".format(s)
+        )
         u = compat.to_unicode(s, "ISO-8859-1")
     return u
 
@@ -564,12 +568,12 @@ def read_and_discard_input(environ):
             _logger.error("--> wsgi_input.read(): {}".format(sys.exc_info()))
 
 
-def fail(value, contextinfo=None, srcexception=None, errcondition=None):
+def fail(value, context_info=None, src_exception=None, err_condition=None):
     """Wrapper to raise (and log) DAVError."""
     if isinstance(value, Exception):
         e = as_DAVError(value)
     else:
-        e = DAVError(value, contextinfo, srcexception, errcondition)
+        e = DAVError(value, context_info, src_exception, err_condition)
     _logger.error("Raising DAVError {}".format(e.get_user_info()))
     raise e
 
@@ -696,7 +700,7 @@ def make_complete_url(environ, localUri=None):
 # ========================================================================
 
 
-def parse_xml_body(environ, allowEmpty=False):
+def parse_xml_body(environ, allow_empty=False):
     """Read request body XML into an etree.Element.
 
     Return None, if no request body was sent.
@@ -735,7 +739,7 @@ def parse_xml_body(environ, allowEmpty=False):
     """
     #
     clHeader = environ.get("CONTENT_LENGTH", "").strip()
-    #    contentLength = -1 # read all of stream
+    #    content_length = -1 # read all of stream
     if clHeader == "":
         # No Content-Length given: read to end of stream
         # TODO: etree.parse() locks, if input is invalid?
@@ -745,20 +749,20 @@ def parse_xml_body(environ, allowEmpty=False):
         requestbody = ""
     else:
         try:
-            contentLength = int(clHeader)
-            if contentLength < 0:
+            content_length = int(clHeader)
+            if content_length < 0:
                 raise DAVError(HTTP_BAD_REQUEST, "Negative content-length.")
         except ValueError:
             raise DAVError(HTTP_BAD_REQUEST, "content-length is not numeric.")
 
-        if contentLength == 0:
+        if content_length == 0:
             requestbody = ""
         else:
-            requestbody = environ["wsgi.input"].read(contentLength)
+            requestbody = environ["wsgi.input"].read(content_length)
             environ["wsgidav.all_input_read"] = 1
 
     if requestbody == "":
-        if allowEmpty:
+        if allow_empty:
             return None
         else:
             raise DAVError(HTTP_BAD_REQUEST, "Body must not be empty.")
@@ -766,7 +770,7 @@ def parse_xml_body(environ, allowEmpty=False):
     try:
         rootEL = etree.fromstring(requestbody)
     except Exception as e:
-        raise DAVError(HTTP_BAD_REQUEST, "Invalid XML format.", srcexception=e)
+        raise DAVError(HTTP_BAD_REQUEST, "Invalid XML format.", src_exception=e)
 
     # If dumps of the body are desired, then this is the place to do it pretty:
     if environ.get("wsgidav.dump_request_body"):
@@ -792,7 +796,7 @@ def parse_xml_body(environ, allowEmpty=False):
 #    return [ body ]
 
 
-def send_status_response(environ, start_response, e, add_headers=None):
+def send_status_response(environ, start_response, e, add_headers=None, is_head=False):
     """Start a WSGI response for a DAVError or status code."""
     status = get_http_status_string(e)
     headers = []
@@ -815,6 +819,8 @@ def send_status_response(environ, start_response, e, add_headers=None):
     assert isinstance(e, DAVError)
 
     content_type, body = e.get_response_page()
+    if is_head:
+        body = compat.b_empty
 
     assert compat.is_bytes(body), body  # If not, Content-Length is wrong!
     start_response(
@@ -898,7 +904,7 @@ def add_property_response(multistatusEL, href, propList):
         propDict.setdefault(status, []).append((name, value))
 
     # <response>
-    responseEL = make_sub_element(multistatusEL, "{DAV:}response", nsmap=nsMap)
+    responseEL = make_sub_element(multistatusEL, "{DAV:}response", ns_map=nsMap)
 
     #    log("href value:{}".format(string_repr(href)))
     #    etree.SubElement(responseEL, "{DAV:}href").text = toUnicode(href)
@@ -920,7 +926,7 @@ def add_property_response(multistatusEL, href, propList):
                 # value must be string or unicode
                 #                log("{} value:{}".format(name, string_repr(value)))
                 #                etree.SubElement(propEL, name).text = value
-                etree.SubElement(propEL, name).text = toUnicode(value)
+                etree.SubElement(propEL, name).text = to_unicode_safe(value)
         # <status>
         etree.SubElement(propstatEL, "{DAV:}status").text = "HTTP/1.1 {}".format(status)
 
@@ -943,7 +949,7 @@ def calc_base64(s):
     return compat.to_native(s)
 
 
-def get_etag(filePath):
+def get_etag(file_path):
     """Return a strong Entity Tag for a (file)path.
 
     http://www.webdav.org/specs/rfc4918.html#etag
@@ -957,19 +963,19 @@ def get_etag(filePath):
     # (At least on Vista) os.path.exists returns False, if a file name contains
     # special characters, even if it is correctly UTF-8 encoded.
     # So we convert to unicode. On the other hand, md5() needs a byte string.
-    if compat.is_bytes(filePath):
-        unicodeFilePath = toUnicode(filePath)
+    if compat.is_bytes(file_path):
+        unicodeFilePath = to_unicode_safe(file_path)
     else:
-        unicodeFilePath = filePath
-        filePath = filePath.encode("utf8")
+        unicodeFilePath = file_path
+        file_path = file_path.encode("utf8")
 
     if not os.path.isfile(unicodeFilePath):
-        return md5(filePath).hexdigest()
+        return md5(file_path).hexdigest()
 
     if sys.platform == "win32":
         statresults = os.stat(unicodeFilePath)
         return (
-            md5(filePath).hexdigest()
+            md5(file_path).hexdigest()
             + "-"
             + str(statresults[stat.ST_MTIME])
             + "-"
@@ -1088,7 +1094,7 @@ def read_timeout_value_header(timeoutvalue):
 # ========================================================================
 
 
-def evaluate_http_conditionals(davres, lastmodified, entitytag, environ):
+def evaluate_http_conditionals(dav_res, last_modified, entitytag, environ):
     """Handle 'If-...:' headers (but not 'If:' header).
 
     If-Match
@@ -1112,7 +1118,7 @@ def evaluate_http_conditionals(davres, lastmodified, entitytag, environ):
         Only send the response if the entity has not been modified since a
         specific time.
     """
-    if not davres:
+    if not dav_res:
         return
     # Conditions
 
@@ -1122,7 +1128,7 @@ def evaluate_http_conditionals(davres, lastmodified, entitytag, environ):
     # cache validators, MUST NOT return a response status of 304 (Not Modified) unless doing so
     # is consistent with all of the conditional header fields in the request.
 
-    if "HTTP_IF_MATCH" in environ and davres.support_etag():
+    if "HTTP_IF_MATCH" in environ and dav_res.support_etag():
         ifmatchlist = environ["HTTP_IF_MATCH"].split(",")
         for ifmatchtag in ifmatchlist:
             ifmatchtag = ifmatchtag.strip(' "\t')
@@ -1132,9 +1138,9 @@ def evaluate_http_conditionals(davres, lastmodified, entitytag, environ):
 
     # TODO: after the refactoring
     ifModifiedSinceFailed = False
-    if "HTTP_IF_MODIFIED_SINCE" in environ and davres.support_modified():
+    if "HTTP_IF_MODIFIED_SINCE" in environ and dav_res.support_modified():
         ifmodtime = parse_time_string(environ["HTTP_IF_MODIFIED_SINCE"])
-        if ifmodtime and ifmodtime > lastmodified:
+        if ifmodtime and ifmodtime > last_modified:
             ifModifiedSinceFailed = True
 
     # If-None-Match
@@ -1143,7 +1149,7 @@ def evaluate_http_conditionals(davres, lastmodified, entitytag, environ):
     # field (s) in the request. That is, if no entity tags match, then the server MUST NOT return
     # a 304 (Not Modified) response.
     ignoreIfModifiedSince = False
-    if "HTTP_IF_NONE_MATCH" in environ and davres.support_etag():
+    if "HTTP_IF_NONE_MATCH" in environ and dav_res.support_etag():
         ifmatchlist = environ["HTTP_IF_NONE_MATCH"].split(",")
         for ifmatchtag in ifmatchlist:
             ifmatchtag = ifmatchtag.strip(' "\t')
@@ -1160,9 +1166,9 @@ def evaluate_http_conditionals(davres, lastmodified, entitytag, environ):
                 )
         ignoreIfModifiedSince = True
 
-    if "HTTP_IF_UNMODIFIED_SINCE" in environ and davres.support_modified():
+    if "HTTP_IF_UNMODIFIED_SINCE" in environ and dav_res.support_modified():
         ifunmodtime = parse_time_string(environ["HTTP_IF_UNMODIFIED_SINCE"])
-        if ifunmodtime and ifunmodtime <= lastmodified:
+        if ifunmodtime and ifunmodtime <= last_modified:
             raise DAVError(
                 HTTP_PRECONDITION_FAILED, "If-Unmodified-Since header condition failed"
             )
@@ -1216,7 +1222,7 @@ def parse_if_header_dict(environ):
                         )
                     else:
                         listTagContents.append(
-                            (testflag, "locktoken", listitem.strip("<>"))
+                            (testflag, "lock_token", listitem.strip("<>"))
                         )
                         ifLockList.append(listitem.strip("<>"))
                 testflag = listitem.upper() != "NOT"
@@ -1234,7 +1240,7 @@ def parse_if_header_dict(environ):
     return
 
 
-def test_if_header_dict(davres, dictIf, fullurl, locktokenlist, entitytag):
+def test_if_header_dict(dav_res, dictIf, fullurl, locktokenlist, entitytag):
     _logger.debug(
         "test_if_header_dict({}, {}, {})".format(fullurl, locktokenlist, entitytag)
     )
@@ -1247,7 +1253,7 @@ def test_if_header_dict(davres, dictIf, fullurl, locktokenlist, entitytag):
         return True
 
     #    supportEntityTag = dav.isInfoTypeSupported(path, "etag")
-    supportEntityTag = davres.support_etag()
+    supportEntityTag = dav_res.support_etag()
     for listTestConds in listTest:
         matchfailed = False
 
@@ -1256,7 +1262,7 @@ def test_if_header_dict(davres, dictIf, fullurl, locktokenlist, entitytag):
                 testresult = entitytag == checkvalue
             elif checkstyle == "entity":
                 testresult = testflag
-            elif checkstyle == "locktoken":
+            elif checkstyle == "lock_token":
                 testresult = checkvalue in locktokenlist
             else:  # unknown
                 testresult = True

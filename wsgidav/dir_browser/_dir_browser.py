@@ -1,13 +1,14 @@
+# -*- coding: utf-8 -*-
 # (c) 2009-2018 Martin Wendt and contributors; see WsgiDAV https://github.com/mar10/wsgidav
 # Licensed under the MIT license:
 # http://www.opensource.org/licenses/mit-license.php
 """
 WSGI middleware that handles GET requests on collections to display directories.
 """
+from fnmatch import fnmatch
 import os
 import sys
 
-from fnmatch import fnmatch
 from jinja2 import Environment, FileSystemLoader
 
 from wsgidav import __version__, compat, util
@@ -57,14 +58,14 @@ class WsgiDavDirBrowser(BaseMiddleware):
     def __call__(self, environ, start_response):
         path = environ["PATH_INFO"]
 
-        davres = None
+        dav_res = None
         if environ["wsgidav.provider"]:
-            davres = environ["wsgidav.provider"].get_resource_inst(path, environ)
+            dav_res = environ["wsgidav.provider"].get_resource_inst(path, environ)
 
         if (
             environ["REQUEST_METHOD"] in ("GET", "HEAD")
-            and davres
-            and davres.is_collection
+            and dav_res
+            and dav_res.is_collection
         ):
 
             if util.get_content_length(environ) != 0:
@@ -74,7 +75,9 @@ class WsgiDavDirBrowser(BaseMiddleware):
                 )
 
             if environ["REQUEST_METHOD"] == "HEAD":
-                return util.send_status_response(environ, start_response, HTTP_OK)
+                return util.send_status_response(
+                    environ, start_response, HTTP_OK, is_head=True
+                )
 
             # Support DAV mount (http://www.ietf.org/rfc/rfc4709.txt)
             dirConfig = environ["wsgidav.config"].get("dir_browser", {})
@@ -97,7 +100,7 @@ class WsgiDavDirBrowser(BaseMiddleware):
                 )
                 return [res]
 
-            context = self._get_context(environ, davres)
+            context = self._get_context(environ, dav_res)
 
             res = self.template.render(**context)
             res = compat.to_bytes(res)
@@ -114,9 +117,9 @@ class WsgiDavDirBrowser(BaseMiddleware):
 
         return self.next_app(environ, start_response)
 
-    def _fail(self, value, contextinfo=None, srcexception=None, errcondition=None):
+    def _fail(self, value, context_info=None, src_exception=None, err_condition=None):
         """Wrapper to raise (and log) DAVError."""
-        e = DAVError(value, contextinfo, srcexception, errcondition)
+        e = DAVError(value, context_info, src_exception, err_condition)
         if self.verbose >= 4:
             _logger.warn(
                 "Raising DAVError {}".format(
@@ -125,25 +128,25 @@ class WsgiDavDirBrowser(BaseMiddleware):
             )
         raise e
 
-    def _get_context(self, environ, davres):
+    def _get_context(self, environ, dav_res):
         """
         @see: http://www.webdav.org/specs/rfc4918.html#rfc.section.9.4
         """
-        assert davres.is_collection
+        assert dav_res.is_collection
 
         dirConfig = environ["wsgidav.config"].get("dir_browser", {})
-        isReadOnly = environ["wsgidav.provider"].is_readonly()
+        is_readonly = environ["wsgidav.provider"].is_readonly()
 
         context = {
             "htdocs": (self.config.get("mount_path") or "") + ASSET_SHARE,
             "rows": [],
             "version": __version__,
-            "displaypath": compat.unquote(davres.get_href()),
-            #"url": davres.get_href(),  # util.make_complete_url(environ),
+            "display_path": compat.unquote(dav_res.get_href()),
+            #"url": dav_res.get_href(),  # util.make_complete_url(environ),
             "url": util.make_complete_url(environ),
-            "parentUrl": util.get_uri_parent(davres.get_href()),
+            "parent_url": util.get_uri_parent(dav_res.get_href()),
             "config": dirConfig,
-            "is_readonly": isReadOnly,
+            "is_readonly": is_readonly,
         }
 
         trailer = dirConfig.get("response_trailer")
@@ -164,37 +167,44 @@ class WsgiDavDirBrowser(BaseMiddleware):
         rows = context["rows"]
 
         # Ask collection for member info list
-        dirInfoList = davres.get_directory_info()
+        dirInfoList = dav_res.get_directory_info()
 
         if dirInfoList is None:
             # No pre-build info: traverse members
             dirInfoList = []
-            childList = davres.get_descendants(depth="1", addSelf=False)
+            childList = dav_res.get_descendants(depth="1", add_self=False)
             for res in childList:
                 di = res.get_display_info()
                 href = res.get_href()
-                classes = []
+                ofe_prefix = None
+                tr_classes = []
+                a_classes = []
                 if res.is_collection:
-                    classes.append("directory")
+                    tr_classes.append("directory")
 
-                if not isReadOnly and not res.is_collection:
+                if not is_readonly and not res.is_collection:
                     ext = os.path.splitext(href)[1].lstrip(".").lower()
                     officeType = msOfficeExtToTypeMap.get(ext)
                     if officeType:
-                        if dirConfig.get("ms_sharepoint_plugin"):
-                            classes.append("msoffice")
-                        elif dirConfig.get("ms_sharepoint_urls"):
-                            href = "ms-{}:ofe|u|{}".format(officeType, href)
+                        if dirConfig.get("ms_sharepoint_support"):
+                            ofe_prefix = "ms-{}:ofe|u|".format(officeType)
+                            a_classes.append("msoffice")
+                        # elif dirConfig.get("ms_sharepoint_plugin"):
+                        #     a_classes.append("msoffice")
+                        # elif dirConfig.get("ms_sharepoint_urls"):
+                        #     href = "ms-{}:ofe|u|{}".format(officeType, href)
 
                 entry = {
                     "href": href,
-                    "class": " ".join(classes),
-                    "displayName": res.get_display_name(),
-                    "lastModified": res.get_last_modified(),
+                    "ofe_prefix": ofe_prefix,
+                    "a_class": " ".join(a_classes),
+                    "tr_class": " ".join(tr_classes),
+                    "display_name": res.get_display_name(),
+                    "last_modified": res.get_last_modified(),
                     "is_collection": res.is_collection,
-                    "contentLength": res.get_content_length(),
-                    "displayType": di.get("type"),
-                    "displayTypeComment": di.get("typeComment"),
+                    "content_length": res.get_content_length(),
+                    "display_type": di.get("type"),
+                    "display_type_comment": di.get("typeComment"),
                 }
 
                 dirInfoList.append(entry)
@@ -207,24 +217,24 @@ class WsgiDavDirBrowser(BaseMiddleware):
             # Skip ignore patterns
             ignore = False
             for pat in ignore_patterns:
-                if fnmatch(entry["displayName"], pat):
-                    _logger.debug("Ignore {}".format(entry["displayName"]))
+                if fnmatch(entry["display_name"], pat):
+                    _logger.debug("Ignore {}".format(entry["display_name"]))
                     ignore = True
                     break
             if ignore:
                 continue
             #
-            lastModified = entry.get("lastModified")
-            if lastModified is None:
-                entry["strModified"] = ""
+            last_modified = entry.get("last_modified")
+            if last_modified is None:
+                entry["str_modified"] = ""
             else:
-                entry["strModified"] = util.get_rfc1123_time(lastModified)
+                entry["str_modified"] = util.get_rfc1123_time(last_modified)
 
-            entry["strSize"] = "-"
+            entry["str_size"] = "-"
             if not entry.get("is_collection"):
-                contentLength = entry.get("contentLength")
-                if contentLength is not None:
-                    entry["strSize"] = util.byte_number_string(contentLength)
+                content_length = entry.get("content_length")
+                if content_length is not None:
+                    entry["str_size"] = util.byte_number_string(content_length)
 
             rows.append(entry)
 
@@ -232,14 +242,19 @@ class WsgiDavDirBrowser(BaseMiddleware):
         sort = "name"
         if sort == "name":
             rows.sort(
+<<<<<<< HEAD:wsgidav/addons/dir_browser/__init__.py
                 key=lambda v: u"{}{}".format(
                     not v["is_collection"], v["displayName"].lower()
+=======
+                key=lambda v: "{}{}".format(
+                    not v["is_collection"], v["display_name"].lower()
+>>>>>>> upstream/master:wsgidav/dir_browser/_dir_browser.py
                 )
             )
 
-        if "http_authenticator.username" in environ:
-            context["username"] = (
-                environ.get("http_authenticator.username") or "anonymous"
+        if "http_authenticator.user_name" in environ:
+            context["user_name"] = (
+                environ.get("http_authenticator.user_name") or "anonymous"
             )
             context["realm"] = environ.get("http_authenticator.realm")
 

@@ -12,6 +12,7 @@ This release contains **BREAKING CHANGES!**
   - Log format is configurable
   - Remove option `dir_browser.enabled` (modify `middleware_stack` instead)
   - CLI supports `--server=gevent` (gevent must be installed separately)
+  - SSL paths are evaluated relative to the config file, if any
   - Refactor middleware stack
     - RequestResolver and WsgiDavDirBrowser are now simple members of `middleware_stack`
       and not specially treated
@@ -23,15 +24,24 @@ This release contains **BREAKING CHANGES!**
 - Refactor code base:
   - **Rename methods** according to PEP 8, e.g.
     `provider.getResourceInst()` => `provider.get_resource_inst()`.
+  - **Rename methods arguments** according to PEP 8, e.g.
+    `provider.set_last_modified(self, destPath, timeStamp, dryRun)`
+    => `provider.set_last_modified(self, dest_path, time_stamp, dry_run)`
   - Enforce [Black code style](https://github.com/ambv/black)
+  - Move some modules to separate packages
+  - Use utf-8 directive in source files (-*- coding: utf-8 -*-)
+- Refactor domain_controller:
+  - ...
 - Refactor WsgiDirBrowser:
   - Use Jinja2 and load static assets through own WsgiDAV provider
-  - Move to `addons.dir_browser` package
-- Support Docker
-  https://cloud.docker.com/swarm/mar10/repository/docker/mar10/wsgidav/
-- **TODO** #94: Use utf-8 as default
-- MSI setup uses Python 3.6
+  - Move to `wsgidav.dir_browser` package
+  - Option 'dir_browser.ms_sharepoint_support' replaces ms_sharepoint_plugin and ms_sharepoint_urls
+- Automated [Docker builds](https://hub.docker.com/r/mar10/wsgidav/)
+- MSI installer
+  - uses Cheroot/6.4 Python 3.6
+  - Includes NTDomainController
 - #112: Added limited support for Microsoft's Win32LastModified property.
+- Fix #123: HEAD request on DirBrowser folder
 
 
 ## 2.4.1 / 2018-06-16

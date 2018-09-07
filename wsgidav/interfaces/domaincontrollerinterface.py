@@ -8,8 +8,8 @@ class IDomainController(object):
     This class is an interface for a domain controller.
     Implementations in WsgiDAV include::
 
-        wsgidav.domain_controller.WsgiDAVDomainController
-        wsgidav.addons.nt_domain_controller.NTDomainController
+        wsgidav.dc.simple_dc.SimpleDomainController
+        wsgidav.dc.nt_dc.NTDomainController
 
     All methods must be implemented.
 
@@ -29,7 +29,7 @@ class IDomainController(object):
     /fac_eng/courses/ee5903/timetable.pdf -> might resolve to realm 'Engineering General'
     /fac_eng/examsolns/ee5903/thisyearssolns.pdf -> might resolve to realm 'Engineering Lecturers'
     /med_sci/courses/m500/surgery.htm -> might resolve to realm 'Medical Sciences General'
-    and each realm would have a set of username and password pairs that would
+    and each realm would have a set of user_name and password pairs that would
     allow access to the resource.
 
     A domain controller provides this information to the HTTPAuthenticator.

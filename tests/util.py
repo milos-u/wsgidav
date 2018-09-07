@@ -1,4 +1,4 @@
-# -*- coding: iso-8859-1 -*-
+# -*- coding: utf-8 -*-
 # (c) 2009-2018 Martin Wendt and contributors; see WsgiDAV https://github.com/mar10/wsgidav
 # Licensed under the MIT license:
 # http://www.opensource.org/licenses/mit-license.php
@@ -88,8 +88,8 @@ def run_wsgidav_server(with_auth, with_ssl, provider=None, **kwargs):
         "host": "127.0.0.1",
         "port": 8080,
         "provider_mapping": {"/": provider},
-        # None: domain_controller.WsgiDAVDomainController(user_mapping)
-        "domain_controller": None,
+        # None: dc.simple_dc.SimpleDomainController(user_mapping)
+        "http_authenticator": {"domain_controller": None},
         "user_mapping": {},
         "verbose": 1,
         "enable_loggers": [],

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # (c) 2009-2018 Martin Wendt and contributors; see WsgiDAV https://github.com/mar10/wsgidav
 # Original PyFileServer (c) 2005 Ho Chun Wei.
 # Licensed under the MIT license: http://www.opensource.org/licenses/mit-license.php
@@ -26,7 +27,7 @@ def main():
         "enable_loggers": [],
         "property_manager": True,  # True: use property_manager.PropertyManager
         "lock_manager": True,  # True: use lock_manager.LockManager
-        "domain_controller": None,  # None: domain_controller.WsgiDAVDomainController(user_mapping)
+        "domain_controller": None,  # None: dc.simple_dc.SimpleDomainController(user_mapping)
     }
     app = WsgiDAVApp(config)
 

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # (c) 2009-2018 Martin Wendt and contributors; see WsgiDAV https://github.com/mar10/wsgidav
 # Original PyFileServer (c) 2005 Ho Chun Wei.
 # Licensed under the MIT license:
@@ -102,7 +103,7 @@ class ErrorPrinter(BaseMiddleware):
                     "Caught HTTPRequestException(HTTP_INTERNAL_ERROR)\n{}".format(tb)
                 )
                 # traceback.print_exc(10, environ.get("wsgi.errors") or sys.stdout)
-                _logger.error("e.srcexception:\n{}".format(e.srcexception))
+                _logger.error("e.src_exception:\n{}".format(e.src_exception))
             elif e.value in (HTTP_NOT_MODIFIED, HTTP_NO_CONTENT):
                 # _logger.warn("Forcing empty error response for {}".format(e.value))
                 # See paste.lint: these code don't have content

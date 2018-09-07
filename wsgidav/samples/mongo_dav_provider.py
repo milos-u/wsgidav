@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # (c) 2009-2018 Martin Wendt and contributors; see WsgiDAV https://github.com/mar10/wsgidav
 # Licensed under the MIT license: http://www.opensource.org/licenses/mit-license.php
 """
@@ -17,7 +18,7 @@ Valid options are (sample shows defaults)::
             # This options are used with `mongod --auth`
             # The user must be created in the admin db with
             # > use admin
-            # > db.addUser(username, password)
+            # > db.addUser(user_name, password)
             "user": None,              # Authenticate with this user
             "pwd": None,               # ... and password
             }
@@ -156,6 +157,6 @@ class MongoResourceProvider(DAVProvider):
         See DAVProvider.get_resource_inst()
         """
         _logger.info("get_resource_inst('%s')" % path)
-        self._count_getResourceInst += 1
+        self._count_get_resource_inst += 1
         root = ConnectionCollection("/", environ)
         return root.resolve("/", path)

@@ -128,7 +128,7 @@ instead of the instantiated object.
 The built-in middleware derives from :class:`~wsgidav.middleware.BaseMiddleware`, so we can
 simplify as::
 
-    from wsgidav.addons.dir_browser import WsgiDavDirBrowser
+    from wsgidav.dir_browser import WsgiDavDirBrowser
     from wsgidav.debug_filter import WsgiDavDebugFilter
     from wsgidav.error_printer import ErrorPrinter
     from wsgidav.http_authenticator import HTTPAuthenticator
@@ -151,7 +151,7 @@ directory browser, and adds a third-party debugging tool::
 
     import dozer
 
-    # from wsgidav.addons.dir_browser import WsgiDavDirBrowser
+    # from wsgidav.dir_browser import WsgiDavDirBrowser
     from wsgidav.debug_filter import WsgiDavDebugFilter
     from wsgidav.error_printer import ErrorPrinter
     from wsgidav.http_authenticator import HTTPAuthenticator
@@ -193,7 +193,7 @@ explicitly listed::
         - wsgidav.debug_filter.WsgiDavDebugFilter
         - wsgidav.error_printer.ErrorPrinter
         - wsgidav.http_authenticator.HTTPAuthenticator
-        - wsgidav.addons.dir_browser.WsgiDavDirBrowser
+        - wsgidav.dir_browser.WsgiDavDirBrowser
         - wsgidav.request_resolver.RequestResolver
 
 Note that the external middleware must be available, for example by calling
@@ -216,19 +216,59 @@ Lock Manager
 Domain Controller
 -----------------
 
-Example:
-use a domain controller that allows users to authenticate against a
-Windows NT domain or a local computer.
-The :class:`~wsgidav.addons.nt_domain_controller.NTDomainController`
-requires basic authentication::
+The HTTP authentication middleware relies on a domain controller.
+Currently two variants are supported.
 
-    from wsgidav.addons.nt_domain_controller import NTDomainController
-    domain_controller = NTDomainController(presetdomain=None, presetserver=None)
-    http_authenticator = {
-        "accept_basic": True,
-        "accept_digest": False,
-        "default_to_digest": False,
-        }
+SimpleDomainController
+~~~~~~~~~~~~~~~~~~~~~~
+
+Allows to authenticate against a plain mapping of shares and user names.
+
+Example YAML configuration::
+
+    http_authenticator:
+        domain_controller: null  # Same as wsgidav.dc.simple_dc.SimpleDomainController
+        accept_basic: true
+        accept_digest: true
+        default_to_digest: true
+
+    user_mapping:
+        "/share1":
+            "user1":
+                password: "abc123"
+                description: "User 1 for Share 1"
+                roles: []
+        "/share2":
+            "user1":
+                password: "def456"
+                description: "User 1 for Share 2"
+                roles: []
+            "user2":
+                password: "qwerty"
+                description: "User 2 for Share 2"
+                roles: []
+
+
+
+NTDomainController
+~~~~~~~~~~~~~~~~~~
+Allows users to authenticate against a Windows NT domain or a local computer.
+
+The :class:`~wsgidav.dc.nt_dc.NTDomainController`
+requires basic authentication and thererfore should use SSL.
+Example YAML configuration::
+
+    ssl_certificate: wsgidav/server/sample_bogo_server.crt
+    ssl_private_key: wsgidav/server/sample_bogo_server.key
+    ssl_certificate_chain: None
+
+    http_authenticator:
+        domain_controller: wsgidav.dc.nt_dc.NTDomainController
+        accept_basic: true
+        accept_digest: false
+        default_to_digest: false
+        preset_domain: null
+        preset_server: null
 
 
 Sample ``wsgidav.yaml``
@@ -249,11 +289,14 @@ Sample ``wsgidav.json``
 We can also use a `JSON <http://www.json.org>`_ file for configuration.
 The structure is identical to the YAML format.
 
-Note that the parser tolerates JavaScript-style comments:
 
-.. literalinclude:: ../sample_wsgidav.json
-    :linenos:
-    :language: json
+See the :doc:`sample_wsgidav.json` example.
+(Note that the parser allows JavaScript-style comments)
+
+..
+    .. literalinclude:: sample_wsgidav.json
+        :linenos:
+        :language: json
 
 
 Sample ``wsgidav.conf``

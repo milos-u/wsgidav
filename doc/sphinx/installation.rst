@@ -21,7 +21,21 @@ WsgiDAV server was tested with these operating systems (among others):
 WsgiDAV requires
 
   * `Python <https://www.python.org/downloads/>`_ 2.7 or 3.4+
-  * Optionally `lxml <http://codespeak.net/lxml/>`_ (will fall back to xml)
+  * A WSGI compliant web server. |br|
+    WsigDAV is a WSGI application, that must be served by a compliant web server.
+    Among others, there are `CherryPy / Cheroot <https://github.com/cherrypy/cheroot>`_,
+    `gevent <http://www.gevent.org/>`_,
+    `gunicorn <http://gunicorn.org/>`_,
+    `mod_wsgi <http://modwsgi.readthedocs.io/>`_,
+    `uWSGI <https://uwsgi-docs.readthedocs.io/>`_,
+    and many more.
+    |br|
+    Simply choose a server that suites you best.
+    If unsure, we recommend Cheroot (the server that backs CherryPy) which has
+    `proven to be pretty performant and stable <https://blog.appdynamics.com/engineering/a-performance-analysis-of-python-wsgi-servers-part-2/>`_.
+    Cheroot comes also bundled with the MSI installer.
+  * Optionally `lxml <http://codespeak.net/lxml/>`_ for slight performance
+    improvements (speed up performance of PROPPATCH requests up to 10%).
 
 
 Unix / Linux
@@ -73,5 +87,18 @@ Basically the same as for `Unix / Linux`_
 Docker
 ------
 
-An experimental Docker image is available here:
-https://cloud.docker.com/swarm/mar10/repository/docker/mar10/wsgidav/
+An experimental Docker image that exposes a local directory using WebDAV
+is available here:
+https://hub.docker.com/r/mar10/wsgidav/
+
+::
+
+    $ docker pull mar10/wsgidav
+    $ docker run --rm -it -p <PORT>:8080 -v <ROOT_FOLDER>:/var/wsgidav-root mar10/wsgidav
+
+for example::
+
+    $ docker run --rm -it -p 8080:8080 -v c:/temp:/var/wsgidav-root mar10/wsgidav
+
+Then open (or enter this URL in Windows File Explorer or any other WebDAV client)
+http://localhost:8080/

@@ -58,8 +58,8 @@ class ServerTest(unittest.TestCase):
             "enable_loggers": [],
             "property_manager": None,  # None: no property manager
             "lock_manager": True,  # True: use lock_manager.LockManager
-            # None: domain_controller.WsgiDAVDomainController(user_mapping)
-            "domain_controller": None,
+            # None: dc.simple_dc.SimpleDomainController(user_mapping)
+            # "domain_controller": None,
         }
 
         if withAuthentication:

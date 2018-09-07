@@ -1,10 +1,10 @@
-# -*- coding: iso-8859-1 -*-
+# -*- coding: utf-8 -*-
 # (c) 2009-2018 Martin Wendt and contributors; see WsgiDAV https://github.com/mar10/wsgidav
 # Licensed under the MIT license:
 # http://www.opensource.org/licenses/mit-license.php
 
 """
-Unit tests for wsgidav.addons.stream_tools.FileLikeQueue
+Unit tests for wsgidav.stream_tools.FileLikeQueue
 """
 
 import os
@@ -16,7 +16,7 @@ import requests
 
 from tests.util import Timing, WsgiDavTestServer, write_test_file
 from wsgidav import compat
-from wsgidav.addons.stream_tools import FileLikeQueue
+from wsgidav.stream_tools import FileLikeQueue
 from wsgidav.dav_provider import DAVNonCollection, DAVProvider
 
 # ----------------------------------------------------------------------------
@@ -37,9 +37,9 @@ class MockProxyResource(DAVNonCollection):
         self.target_path = target_path
         self.worker = None
 
-    def begin_write(self, contentType=None):
+    def begin_write(self, content_type=None):
         # print("begin_write: {}".format(self.target_path))
-        queue = FileLikeQueue(maxsize=1)
+        queue = FileLikeQueue(max_size=1)
 
         # Simulate an asynchrounous consumer. We use a file, so we can check
         # the result from the parent unittest process. In real live this could be
@@ -62,7 +62,7 @@ class MockProxyResource(DAVNonCollection):
         self.worker.start()
         return queue
 
-    def end_write(self, withErrors):
+    def end_write(self, with_errors):
         print("end_write: {}".format(self.target_path))
         self.worker.join()
 

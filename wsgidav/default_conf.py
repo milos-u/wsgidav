@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # (c) 2009-2018 Martin Wendt and contributors; see WsgiDAV https://github.com/mar10/wsgidav
 # Original PyFileServer (c) 2005 Ho Chun Wei.
 # Licensed under the MIT license:
@@ -13,7 +14,7 @@
 
 Default confguration.
 """
-from wsgidav.addons.dir_browser import WsgiDavDirBrowser
+from wsgidav.dir_browser import WsgiDavDirBrowser
 from wsgidav.debug_filter import WsgiDavDebugFilter
 from wsgidav.error_printer import ErrorPrinter
 from wsgidav.http_authenticator import HTTPAuthenticator
@@ -47,14 +48,15 @@ DEFAULT_CONFIG = {
     ],
     # HTTP Authentication Options
     "http_authenticator": {
+        # None: dc.simple_dc.SimpleDomainController(user_mapping)
+        "domain_controller": None,
         "accept_basic": True,  # Allow basic authentication, True or False
         "accept_digest": True,  # Allow digest authentication, True or False
         "default_to_digest": True,  # True (default digest) or False (default basic)
         # Name of a header field that will be accepted as authorized user
         "trusted_auth_header": None,
     },
-    # None: domain_controller.WsgiDAVDomainController(user_mapping)
-    "domain_controller": None,
+    #: Used by SimpleDomainController
     "user_mapping": {},
     # Verbose Output
     # 0 - no output
@@ -83,7 +85,8 @@ DEFAULT_CONFIG = {
         "davmount": False,
         # Add an 'open as webfolder' link (requires Windows clients):
         "ms_mount": False,
-        "ms_sharepoint_plugin": True,  # Invoke MS Offce documents for editing using WebDAV
-        "ms_sharepoint_urls": False,  # Prepend 'ms-word:ofe|u|' to URL for MS Offce documents
+        "ms_sharepoint_support": True,  # Invoke MS Offce documents for editing using WebDAV
+        # "ms_sharepoint_plugin": False,  # Invoke MS Offce documents for editing using WebDAV
+        # "ms_sharepoint_urls": False,  # Prepend 'ms-word:ofe|u|' to URL for MS Offce documents
     },
 }

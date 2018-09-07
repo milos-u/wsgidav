@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # (c) 2009-2018 Martin Wendt and contributors; see WsgiDAV https://github.com/mar10/wsgidav
 # Original PyFileServer (c) 2005 Ho Chun Wei.
 # Licensed under the MIT license:
@@ -31,11 +32,11 @@ Realms
    http://<servername:port>/<approot>/pubshare/WsgiDAV/LICENSE
 
 Users
-   A number of username/password pairs can be set for each realm::
+   A number of user_name/password pairs can be set for each realm::
 
-      adduser('pubshare', 'username', 'password', 'description/unused')
+      adduser('pubshare', 'user_name', 'password', 'description/unused')
 
-   would add a username/password pair to realm /pubshare.
+   would add a user_name/password pair to realm /pubshare.
 
 Note: if developers wish to maintain a separate users database, you can
 write your own domain controller for the HTTPAuthenticator. See
