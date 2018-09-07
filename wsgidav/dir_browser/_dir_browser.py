@@ -243,7 +243,7 @@ class WsgiDavDirBrowser(BaseMiddleware):
         if sort == "name":
             rows.sort(
                 key=lambda v: u"{}{}".format(
-                    not v["is_collection"], v["displayName"].lower()
+                    not v["is_collection"], v["display_name"].lower()
                 )
             )
 
