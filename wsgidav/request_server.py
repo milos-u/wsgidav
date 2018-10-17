@@ -973,8 +973,9 @@ class RequestServer(object):
         # Cannot create or new members in locked-0 collections
         if not destExists:
             self._check_write_permission(destParentRes, "0", environ)
-        # If target exists, it must not be locked
-        self._check_write_permission(destRes, "infinity", environ)
+        else:
+            # If target exists, it must not be locked
+            self._check_write_permission(destRes, "infinity", environ)
 
         if srcPath == destPath:
             self._fail(HTTP_FORBIDDEN, "Cannot copy/move source onto itself")
@@ -997,7 +998,7 @@ class RequestServer(object):
 
         try:
             if is_move:
-                handled = srcRes.handle_move(destPath)
+                handled = srcRes.handle_move(destPath, destParentRes, destRes)
             else:
                 isInfinity = environ["HTTP_DEPTH"] == "infinity"
                 handled = srcRes.handle_copy(destPath, isInfinity)

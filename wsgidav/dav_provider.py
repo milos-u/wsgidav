@@ -1057,7 +1057,7 @@ class _DAVResource(object):
         """
         raise NotImplementedError
 
-    def handle_move(self, dest_path):
+    def handle_move(self, dest_path, destParentRes, destRes=None):
         """Handle a MOVE request natively.
 
         This method is called by the MOVE handler after checking for valid
