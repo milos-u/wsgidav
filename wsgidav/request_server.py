@@ -1011,7 +1011,7 @@ class RequestServer(object):
             handled = True
         if handled:
             return self._send_response(
-                environ, start_response, srcRes, HTTP_NO_CONTENT, error_list
+                environ, start_response, srcRes, success_code, error_list
             )
 
         # --- Cleanup destination before copy/move ----------------------------
