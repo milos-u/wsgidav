@@ -982,7 +982,7 @@ class _DAVResource(object):
         """
         raise NotImplementedError
 
-    def handle_copy(self, dest_path, depth_infinity):
+    def handle_copy(self, dest_path, depth_infinity, destParentRes, destRes=None):
         """Handle a COPY request natively.
 
         This method is called by the COPY handler after checking for valid

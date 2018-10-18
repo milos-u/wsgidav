@@ -1001,7 +1001,7 @@ class RequestServer(object):
                 handled = srcRes.handle_move(destPath, destParentRes, destRes)
             else:
                 isInfinity = environ["HTTP_DEPTH"] == "infinity"
-                handled = srcRes.handle_copy(destPath, isInfinity)
+                handled = srcRes.handle_copy(destPath, isInfinity, destParentRes, destRes)
             assert handled in (True, False) or type(handled) is list
             if type(handled) is list:
                 error_list = handled
