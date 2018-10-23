@@ -1162,6 +1162,10 @@ class _DAVResource(object):
         """
         pass
 
+    def get_physical_path(self, environ):
+        """Get filesystem path to the file to be used with X-Accel-Redirect """
+        return None
+
 
 # ========================================================================
 # DAVNonCollection

@@ -1601,6 +1601,11 @@ class RequestServer(object):
 
         res.finalize_headers(environ, response_headers)
 
+        path = res.get_physical_path(environ)
+        # use nginx-X-accel-redirect if configured
+        if path and not is_head_method and environ["wsgidav.config"].get("enable_x_accel_redirect", False):
+            response_headers.append(('X-Accel-Redirect', path.encode('utf-8')))
+
         if ispartialranges:
             # response_headers.append(("Content-Ranges", "bytes " + str(range_start) + "-" +
             #    str(range_end) + "/" + str(range_length)))
@@ -1616,6 +1621,10 @@ class RequestServer(object):
 
         # Return empty body for HEAD requests
         if is_head_method:
+            yield b""
+            return
+
+        if environ["wsgidav.config"].get("enable_x_accel_redirect", False) and path:
             yield b""
             return
 
