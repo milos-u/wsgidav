@@ -452,9 +452,9 @@ def byte_number_string(
 
     if appendBytes:
         if number == 1:
-            bytesuffix = " Byte"
+            bytesuffix = "B"
         else:
-            bytesuffix = " Bytes"
+            bytesuffix = "B"
 
     if thousandsSep and (number >= 1000 or magsuffix):
         # locale.setlocale(locale.LC_ALL, "")
@@ -464,7 +464,7 @@ def byte_number_string(
     else:
         snum = str(number)
 
-    return "{}{}{}".format(snum, magsuffix, bytesuffix)
+    return "{} {}{}".format(snum, magsuffix, bytesuffix)
 
 
 # ========================================================================

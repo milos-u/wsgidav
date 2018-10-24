@@ -261,12 +261,12 @@ class _DAVResource(object):
         This default implementation returns ``{'type': '...'}``
         """
         if self.is_collection:
-            return {"type": "Directory"}
+            return {"type": u'Adresář'.encode('utf-8')}
         elif os.extsep in self.name:
             ext = self.name.split(os.extsep)[-1].upper()
             if len(ext) < 5:
-                return {"type": "{}-File".format(ext)}
-        return {"type": "File"}
+                return {"type": "soubor {}".format(ext)}
+        return {"type": u'Soubor'}
 
     def get_etag(self):
         """
@@ -291,6 +291,10 @@ class _DAVResource(object):
 
         This method SHOULD be implemented, especially by non-collections.
         """
+        return None
+
+    def get_last_modified_txt(self):
+        """Contains the last modified date for pretty printing in dir browser """
         return None
 
     def set_last_modified(self, dest_path, time_stamp, dry_run):

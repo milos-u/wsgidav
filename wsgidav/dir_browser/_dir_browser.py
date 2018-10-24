@@ -200,7 +200,7 @@ class WsgiDavDirBrowser(BaseMiddleware):
                     "a_class": " ".join(a_classes),
                     "tr_class": " ".join(tr_classes),
                     "display_name": res.get_display_name(),
-                    "last_modified": res.get_last_modified(),
+                    "str_modified": res.get_last_modified_txt(),
                     "is_collection": res.is_collection,
                     "content_length": res.get_content_length(),
                     "display_type": di.get("type"),
@@ -224,11 +224,11 @@ class WsgiDavDirBrowser(BaseMiddleware):
             if ignore:
                 continue
             #
-            last_modified = entry.get("last_modified")
-            if last_modified is None:
-                entry["str_modified"] = ""
-            else:
-                entry["str_modified"] = util.get_rfc1123_time(last_modified)
+            #last_modified = entry.get("last_modified")
+            #if last_modified is None:
+            #    entry["str_modified"] = ""
+            #else:
+            #    entry["str_modified"] = util.get_rfc1123_time(last_modified)
 
             entry["str_size"] = "-"
             if not entry.get("is_collection"):

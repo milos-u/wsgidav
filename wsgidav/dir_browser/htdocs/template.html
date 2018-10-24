@@ -16,7 +16,7 @@
     {%- if config.icon %}
     <img class="logo" alt="WsgiDAV" title="WsgiDAV" src="{{ htdocs }}/logo.png">
     {% endif -%}
-    Index of {{ display_path }}
+    Výpis adresáře {{ display_path }}
   </h1>
 
   {% if config.davmount or config.ms_mount %}
@@ -26,14 +26,14 @@
     {% endif -%}
     {%- if config.ms_mount %}
       {% if config.davmount %} &#8211; {% endif %}
-      <a title="Open as Web Folder (requires Microsoft Internet Explorer 7 or older!)"
-          href="" folder="{{ url }}">Open as Web Folder</a>
+      <a title="Otevřít jako Web Folder (vyžaduje Microsoft Internet Explorer 7 nebo starší!)"
+          href="" folder="{{ url }}">Otevřít jako Web Folder</a>
     {% endif %}
   </p>
   {% endif %}
 
   {%- if user_name and config.show_user %}
-  <p class="auth-user">Authenticated user: "{{user_name}}", realm: "{{realm}}". <a class="logout" href="/" onclick="return doLogout(event)">[Logout]</a></p>
+  <p class="auth-user">Přihlášený uživatel: "{{user_name}}", systém: "{{realm}}". <a class="logout" href="/" onclick="return doLogout(event)">[Odhlásit]</a></p>
   {% endif -%}
 
   <hr>
@@ -49,10 +49,10 @@
 
     <thead>
       <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Size</th>
-        <th>Last modified</th>
+        <th>Název</th>
+        <th>Typ</th>
+        <th>Velikost</th>
+        <th>Poslední změna</th>
       </tr>
     </thead>
 
@@ -62,7 +62,7 @@
           <td>
             <a href="{{ parent_url }}">..</a>
           </td>
-        <td>Directory</td>
+        <td>Adresář</td>
         <td>-</td>
         <td></td>
       </tr>
