@@ -710,12 +710,12 @@ SUPPORTED_SERVERS = {
 }
 
 
-def run():
+def run(app_class=WsgiDAVApp):
     config = _init_config()
 
     util.init_logging(config)
 
-    app = WsgiDAVApp(config)
+    app = app_class(config)
 
     server = config["server"]
     handler = SUPPORTED_SERVERS.get(server)
