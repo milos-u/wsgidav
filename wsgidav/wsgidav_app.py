@@ -507,10 +507,18 @@ class WsgiDAVApp(object):
         # Call first middleware
         app_iter = self.application(environ, _start_response_wrapper)
         try:
+            self.start_middleware_processing()
             for v in app_iter:
                 yield v
         finally:
+            self.stop_middleware_processing()
             if hasattr(app_iter, "close"):
                 app_iter.close()
 
         return
+
+    def start_middleware_processing(self):
+        pass
+
+    def stop_middleware_processing(self):
+        pass
