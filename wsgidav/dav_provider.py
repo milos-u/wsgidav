@@ -261,12 +261,12 @@ class _DAVResource(object):
         This default implementation returns ``{'type': '...'}``
         """
         if self.is_collection:
-            return {"type": u'Adresář'.encode('utf-8')}
+            return {"type": 'Adresář'}
         elif os.extsep in self.name:
             ext = self.name.split(os.extsep)[-1].upper()
             if len(ext) < 5:
                 return {"type": "soubor {}".format(ext)}
-        return {"type": u'Soubor'}
+        return {"type": 'Soubor'}
 
     def get_etag(self):
         """
