@@ -68,17 +68,17 @@ __docformat__ = "reStructuredText"
 try:
     from http import client as http_client  # py3
 except ImportError:
-    import httplib as http_client
+    import http.client as http_client
 
 try:
     from http import server as BaseHTTPServer  # py3
 except ImportError:
-    import BaseHTTPServer
+    import http.server
 
 try:
     import socketserver  # py3
 except ImportError:
-    import SocketServer as socketserver
+    import socketserver as socketserver
 
 
 _logger = util.get_module_logger(__name__)
@@ -99,7 +99,7 @@ SERVER_ERROR = """\
 """
 
 
-class ExtHandler(BaseHTTPServer.BaseHTTPRequestHandler):
+class ExtHandler(http.server.BaseHTTPRequestHandler):
 
     _SUPPORTED_METHODS = [
         "HEAD",
@@ -124,7 +124,7 @@ class ExtHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     server_version = "WsgiDAV/{} ExtServer/{} {} Python {}".format(
         __version__,
         _version,
-        BaseHTTPServer.BaseHTTPRequestHandler.server_version,
+        http.server.BaseHTTPRequestHandler.server_version,
         util.PYTHON_VERSION,
     )
 
@@ -207,7 +207,7 @@ class ExtHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             "SERVER_PORT": compat.to_native(self.server.server_address[1]),
             "SERVER_PROTOCOL": self.request_version,
         }
-        for httpHeader, httpValue in self.headers.items():
+        for httpHeader, httpValue in list(self.headers.items()):
             if not httpHeader.lower() in ("content-type", "content-length"):
                 env["HTTP_{}".format(httpHeader.replace("-", "_").upper())] = httpValue
 
@@ -297,7 +297,7 @@ class ExtHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                 raise
 
 
-class ExtServer(socketserver.ThreadingMixIn, BaseHTTPServer.HTTPServer):
+class ExtServer(socketserver.ThreadingMixIn, http.server.HTTPServer):
     def handle_error(self, request, client_address):
         """Handle an error gracefully.  May be overridden.
 
@@ -380,9 +380,9 @@ class ExtServer(socketserver.ThreadingMixIn, BaseHTTPServer.HTTPServer):
         self.stopped = True
 
     def __init__(self, serverAddress, wsgiApplications, serveFiles=1):
-        BaseHTTPServer.HTTPServer.__init__(self, serverAddress, ExtHandler)
+        http.server.HTTPServer.__init__(self, serverAddress, ExtHandler)
         appList = []
-        for urlPath, wsgiApp in wsgiApplications.items():
+        for urlPath, wsgiApp in list(wsgiApplications.items()):
             appList.append((urlPath, wsgiApp))
         self.wsgiApplications = appList
         self.serveFiles = serveFiles

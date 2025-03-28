@@ -91,7 +91,7 @@ class PropertyManager(object):
         try:
             if not self._loaded:
                 return True
-            for k, v in self._dict.items():
+            for k, v in list(self._dict.items()):
                 _dummy = "{}, {}".format(k, v)  # noqa
             #            _logger.debug("{} checks ok {}".format(self.__class__.__name__, msg))
             return True
@@ -108,9 +108,9 @@ class PropertyManager(object):
             if self._verbose >= 4:
                 return  # Already dumped in _lazy_open
         try:
-            for k, v in self._dict.items():
+            for k, v in list(self._dict.items()):
                 _logger.info("    {}".format(k))
-                for k2, v2 in v.items():
+                for k2, v2 in list(v.items()):
                     try:
                         _logger.info("        {}: '{}'".format(k2, v2))
                     except Exception as e:
@@ -127,7 +127,7 @@ class PropertyManager(object):
                 self._lazy_open()
             returnlist = []
             if norm_url in self._dict:
-                for propdata in self._dict[norm_url].keys():
+                for propdata in list(self._dict[norm_url].keys()):
                     returnlist.append(propdata)
             return returnlist
         finally:
@@ -253,7 +253,7 @@ class PropertyManager(object):
                 self._lazy_open()
             if with_children:
                 # Move src_url\*
-                for url in self._dict.keys():
+                for url in list(self._dict.keys()):
                     if util.is_equal_or_child_uri(src_url, url):
                         d = url.replace(src_url, dest_url)
                         self._dict[d] = self._dict[url]

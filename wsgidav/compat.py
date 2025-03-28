@@ -28,10 +28,10 @@ except NameError:
     console_input = input
 
 try:
-    from cStringIO import StringIO
+    from io import StringIO
 
     BytesIO = StringIO
-    import Queue as queue
+    import queue as queue
 except ImportError:
     from io import StringIO  # py3
     from io import BytesIO  # py3
@@ -40,8 +40,8 @@ except ImportError:
 try:
     from urllib.parse import quote, unquote, urlparse  # py3
 except ImportError:
-    from urllib import quote, unquote
-    from urlparse import urlparse
+    from urllib.parse import quote, unquote
+    from urllib.parse import urlparse
 
 try:
     xrange = xrange  # py2
@@ -59,7 +59,7 @@ if PY2:
 
     def is_basestring(s):
         """Return True for any string type (for str/unicode on Py2 and bytes/str on Py3)."""
-        return isinstance(s, basestring)
+        return isinstance(s, str)
 
     def is_bytes(s):
         """Return True for bytestrings (for str on Py2 and bytes on Py3)."""
@@ -71,11 +71,11 @@ if PY2:
 
     def is_unicode(s):
         """Return True for unicode strings (for unicode on Py2 and str on Py3)."""
-        return isinstance(s, unicode)
+        return isinstance(s, str)
 
     def to_bytes(s, encoding="utf8"):
         """Convert unicode (text strings) to binary data (str on Py2 and bytes on Py3)."""
-        if type(s) is unicode:
+        if type(s) is str:
             s = s.encode(encoding)
         elif type(s) is not str:
             s = str(s)
@@ -86,8 +86,8 @@ if PY2:
 
     def to_unicode(s, encoding="utf8"):
         """Convert data to unicode text (unicode on Py2 and str on Py3)."""
-        if type(s) is not unicode:
-            s = unicode(s, encoding)
+        if type(s) is not str:
+            s = str(s, encoding)
         return s
 
 

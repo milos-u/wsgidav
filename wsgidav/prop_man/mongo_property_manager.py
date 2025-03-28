@@ -21,7 +21,7 @@ Valid options are (sample shows defaults)::
             }
 
 """
-from __future__ import print_function
+
 
 import pymongo
 from wsgidav import compat, util
@@ -105,7 +105,7 @@ class MongoPropertyManager(object):
         doc = self.collection.find_one({"_url": norm_url})
         propNames = []
         if doc:
-            for name in doc.keys():
+            for name in list(doc.keys()):
                 if name not in HIDDEN_KEYS:
                     propNames.append(decode_mongo_key(name))
         return propNames

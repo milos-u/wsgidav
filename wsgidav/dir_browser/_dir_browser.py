@@ -35,7 +35,7 @@ msOfficeTypeToExtMap = {
     "visio": ("vsd", "vsdm", "vsdx", "vstm", "vstx"),
 }
 msOfficeExtToTypeMap = {}
-for t, el in msOfficeTypeToExtMap.items():
+for t, el in list(msOfficeTypeToExtMap.items()):
     for e in el:
         msOfficeExtToTypeMap[e] = t
 
@@ -242,7 +242,7 @@ class WsgiDavDirBrowser(BaseMiddleware):
         sort = "name"
         if sort == "name":
             rows.sort(
-                key=lambda v: u"{}{}".format(
+                key=lambda v: "{}{}".format(
                     not v["is_collection"], v["display_name"].lower()
                 )
             )

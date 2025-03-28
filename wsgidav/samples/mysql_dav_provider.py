@@ -56,7 +56,7 @@ its limitations:
       unnecessary queries to the database.
 
 """
-from __future__ import print_function
+
 
 import csv
 import hashlib
@@ -526,7 +526,7 @@ class MySQLBrowserProvider(DAVProvider):
         if row is None:
             cursor.close()
             return None
-        for fname in row.keys():
+        for fname in list(row.keys()):
             dictRet[fname] = compat.to_native(row[fname])
         cursor.close()
         return dictRet

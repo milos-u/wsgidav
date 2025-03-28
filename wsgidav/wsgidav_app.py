@@ -98,7 +98,7 @@ def _check_config(config):
         "locksmanager": "lock_manager",
         "catchall": "error_printer.catch_all",
     }
-    for old, new in deprecated_fields.items():
+    for old, new in list(deprecated_fields.items()):
         if "." in old:
             k, v = old.split(".", 1)
             d = config[k]
@@ -163,7 +163,7 @@ class WsgiDAVApp(object):
 
         self.provider_map = {}
         self.sorted_share_list = None
-        for share, provider in provider_mapping.items():
+        for share, provider in list(provider_mapping.items()):
             self.add_provider(share, provider)
 
         # Figure out the domain controller, used by http_authenticator
@@ -228,7 +228,7 @@ class WsgiDAVApp(object):
             if isinstance(app, HTTPAuthenticator):
                 domain_controller = app.get_domain_controller()
                 # Check anonymous access
-                for share, data in self.provider_map.items():
+                for share, data in list(self.provider_map.items()):
                     if app.allow_anonymous_access(share):
                         data["allow_anonymous"] = True
 
@@ -276,7 +276,7 @@ class WsgiDAVApp(object):
                 "Basic authentication is enabled: It is highly recommended to enable SSL."
             )
 
-        for share, data in self.provider_map.items():
+        for share, data in list(self.provider_map.items()):
             if data["allow_anonymous"]:
                 # TODO: we should only warn here, if --no-auth is not given
                 _logger.warn("Share '{}' will allow anonymous access.".format(share))
@@ -310,7 +310,7 @@ class WsgiDAVApp(object):
 
         # Store the list of share paths, ordered by length, so route lookups
         # will return the most specific match
-        self.sorted_share_list = [s.lower() for s in self.provider_map.keys()]
+        self.sorted_share_list = [s.lower() for s in list(self.provider_map.keys())]
         self.sorted_share_list = sorted(self.sorted_share_list, key=len, reverse=True)
 
         return provider

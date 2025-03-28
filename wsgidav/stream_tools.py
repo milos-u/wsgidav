@@ -16,7 +16,7 @@ consumer at the same time::
         return queue
 
 """
-from __future__ import print_function
+
 
 from wsgidav import compat, util
 

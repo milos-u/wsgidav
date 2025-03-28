@@ -140,7 +140,7 @@ class WsgiDavDebugFilter(BaseMiddleware):
             _logger.info("{} Request ---".format(method))
             # _logger.info("<{}> --- {} Request ---".format(
             #         threading.currentThread().ident, method))
-            for k, v in environ.items():
+            for k, v in list(environ.items()):
                 if k == k.upper():
                     _logger.info("{:<20}: '{}'".format(k, safe_re_encode(v, "utf8")))
             _logger.info("\n")
@@ -173,7 +173,7 @@ class WsgiDavDebugFilter(BaseMiddleware):
                     )
                 )
                 headersdict = dict(sub_app_start_response.response_headers)
-                for envitem in headersdict.keys():
+                for envitem in list(headersdict.keys()):
                     _logger.info("{}: {}".format(envitem, repr(headersdict[envitem])))
                 _logger.info("")
 

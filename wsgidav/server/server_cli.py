@@ -32,7 +32,7 @@ Configuration is defined like this:
        ``--root=FOLDER`` option creates a FilesystemProvider that publishes
        FOLDER on the '/' share.
 """
-from __future__ import print_function
+
 
 import argparse
 import copy
@@ -152,7 +152,7 @@ See https://github.com/mar10/wsgidav for additional information.
     )
     parser.add_argument(
         "--server",
-        choices=SUPPORTED_SERVERS.keys(),
+        choices=list(SUPPORTED_SERVERS.keys()),
         default="cheroot",
         help="type of pre-installed WSGI server to use (default: %(default)s).",
     )
@@ -252,7 +252,7 @@ See https://github.com/mar10/wsgidav for additional information.
     cmdLineOpts = args.__dict__.copy()
     if args.verbose >= 5:
         print("Command line args:")
-        for k, v in cmdLineOpts.items():
+        for k, v in list(cmdLineOpts.items()):
             print("    {:>12}: {}".format(k, v))
     return cmdLineOpts
 
@@ -282,7 +282,7 @@ def _read_config_file(config_file, verbose):
             conf = {}
             configmodule = imp.load_source("configuration_module", config_file)
 
-            for k, v in vars(configmodule).items():
+            for k, v in list(vars(configmodule).items()):
                 if k.startswith("__"):
                     continue
                 elif isfunction(v):
@@ -722,7 +722,7 @@ def run(app_class=WsgiDAVApp):
     if not handler:
         raise RuntimeError(
             "Unsupported server type {!r} (expected {!r})".format(
-                server, "', '".join(SUPPORTED_SERVERS.keys())
+                server, "', '".join(list(SUPPORTED_SERVERS.keys()))
             )
         )
 

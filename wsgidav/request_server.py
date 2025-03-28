@@ -1093,7 +1093,7 @@ class RequestServer(object):
         for sRes in srcList:
             # Skip this resource, if there was a failure copying a parent
             parentError = False
-            for ignorePath in ignoreDict.keys():
+            for ignorePath in list(ignoreDict.keys()):
                 if util.is_equal_or_child_uri(ignorePath, sRes.path):
                     parentError = True
                     break
@@ -1141,7 +1141,7 @@ class RequestServer(object):
                     continue
                 # Skip collections that contain errors (unmoved resources)
                 childError = False
-                for ignorePath in ignoreDict.keys():
+                for ignorePath in list(ignoreDict.keys()):
                     if util.is_equal_or_child_uri(sRes.path, ignorePath):
                         childError = True
                         break

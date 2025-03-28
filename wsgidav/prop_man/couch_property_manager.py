@@ -21,7 +21,7 @@ Valid options are (sample shows defaults)::
             }
 
 """
-from __future__ import print_function
+
 
 from uuid import uuid4
 
@@ -143,7 +143,7 @@ class CouchPropertyManager(object):
         doc = self._find(norm_url)
         propNames = []
         if doc:
-            for name in doc["properties"].keys():
+            for name in list(doc["properties"].keys()):
                 propNames.append(name)
         return propNames
 

@@ -326,7 +326,7 @@ class LockStorageDict(object):
                 __appendLocks(tokList)
 
             if include_children:
-                for u, ltoks in self._dict.items():
+                for u, ltoks in list(self._dict.items()):
                     if util.is_child_uri(key, u):
                         __appendLocks(ltoks)
 

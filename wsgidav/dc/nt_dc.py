@@ -71,7 +71,7 @@ Testability and caveats
 
 ml
 """
-from __future__ import print_function
+
 
 import win32net
 import win32netcon
