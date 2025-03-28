@@ -17,6 +17,7 @@ import socket
 import stat
 import sys
 import time
+from collections.abc import Mapping
 from email.utils import formatdate, parsedate
 from hashlib import md5
 from pprint import pformat
@@ -258,8 +259,8 @@ def get_module_logger(moduleName, defaultToVerbose=False):
 
 
 def deep_update(d, u):
-    for k, v in u.items():
-        if isinstance(v, collections.Mapping):
+    for k, v in list(u.items()):
+        if isinstance(v, Mapping):
             d[k] = deep_update(d.get(k, {}), v)
         else:
             d[k] = v
@@ -309,7 +310,7 @@ def dynamic_instantiate_middleware(name, args, expand=None):
             inst = the_class(*args)
         else:
             assert type(args) is dict
-            args = {k: _expand(v) for k, v in args.items()}
+            args = {k: _expand(v) for k, v in list(args.items())}
             inst = the_class(**args)
 
         _logger.debug("Instantiate {}({}) => {}".format(name, args, inst))
@@ -396,7 +397,7 @@ def safe_re_encode(s, encoding_to, errors="backslashreplace"):
     """Re-encode str or binary so that is compatible with a given encoding (replacing
     unsupported chars).
 
-    We use ASCII as default, which gives us some output that contains \x99 and \u9999
+    We use ASCII as default, which gives us some output that contains \x99 and \\u9999
     for every character > 127, for easier debugging.
     (e.g. if we don't know the encoding, see #87, #96)
     """
