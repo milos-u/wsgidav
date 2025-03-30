@@ -946,7 +946,7 @@ def calc_hexdigest(s):
 def calc_base64(s):
     """Return base64 encoded binarystring."""
     s = compat.to_bytes(s)
-    s = base64.encodestring(s).strip()  # return bytestring
+    s = base64.encodebytes(s).strip()  # return bytestring
     return compat.to_native(s)
 
 
