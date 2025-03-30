@@ -122,7 +122,11 @@ else:  # Python 3
     def to_native(s, encoding="utf8"):
         """Convert data to native str type (bytestring on Py2 and unicode on Py3)."""
         if type(s) is bytes:
-            s = str(s, encoding)
+            try:
+                s = str(s, encoding)
+            except UnicodeDecodeError:
+                # je toto ten proklamovany dirty hack?
+                s = str(s, "cp1250")
         elif type(s) is not str:
             s = str(s)
         return s
