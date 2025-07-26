@@ -6,6 +6,9 @@
 """
 WSGI application that handles one single WebDAV request.
 """
+
+from urllib.parse import quote
+
 from wsgidav import compat, util, xml_tools
 from wsgidav.dav_error import (
     HTTP_BAD_GATEWAY,
@@ -1606,7 +1609,8 @@ class RequestServer(object):
         if path and not is_head_method and environ["wsgidav.config"].get("enable_x_accel_redirect", False):
             if isinstance(path, bytes):
                 path = path.decode("utf-8")
-            response_headers.append(('X-Accel-Redirect', path))
+            url = quote(path.replace("\\", "/"))
+            response_headers.append(('X-Accel-Redirect', url))
 
         if ispartialranges:
             # response_headers.append(("Content-Ranges", "bytes " + str(range_start) + "-" +
