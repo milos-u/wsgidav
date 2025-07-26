@@ -1604,9 +1604,7 @@ class RequestServer(object):
         path = res.get_physical_path(environ)
         # use nginx-X-accel-redirect if configured
         if path and not is_head_method and environ["wsgidav.config"].get("enable_x_accel_redirect", False):
-            if isinstance(path, bytes):
-                path = path.decode("utf-8")
-            response_headers.append(('X-Accel-Redirect', path))
+            response_headers.append(('X-Accel-Redirect', path.encode('utf-8')))
 
         if ispartialranges:
             # response_headers.append(("Content-Ranges", "bytes " + str(range_start) + "-" +
